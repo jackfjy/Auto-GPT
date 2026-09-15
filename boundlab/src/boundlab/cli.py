@@ -4,9 +4,10 @@ import argparse
 import json
 from pathlib import Path
 
+from boundlab.agents.base import AgentResult
 from boundlab.agents.registry import available
 from boundlab.guard import BoundedFS
-from boundlab.models import AccessMode, AgentResult, RunReport
+from boundlab.models import AccessMode, RunReport
 from boundlab.orchestrator import DEFAULT_PIPELINE, Orchestrator
 from boundlab.territory import default_territory_path, load_territories
 
