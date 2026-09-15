@@ -1,0 +1,9 @@
+rules:
+  - id: stay-in-territory
+    description: Never write outside the agent's owns globs.
+  - id: no-shared-mutation
+    description: Only coordinator may write shared/ and inbox/.
+  - id: talk-via-bus
+    description: Cross-agent data goes through the message bus, not file overwrite.
+  - id: one-owner
+    description: Two agents must never own the same path pattern.

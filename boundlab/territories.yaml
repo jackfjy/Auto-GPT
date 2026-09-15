@@ -1,0 +1,54 @@
+# Write territories. Each agent may only write inside its owns globs.
+# Other agents can be given may_read access, but never write access, to those paths.
+# Edit this file when you add a new agent — do not let two agents own the same path.
+
+version: 1
+shared_readonly:
+  - shared/**
+forbidden:
+  - territories.yaml
+  - src/**
+  - tests/**
+
+agents:
+  coordinator:
+    role: merge published artifacts into shared/
+    owns:
+      - shared/**
+      - inbox/**
+    may_read:
+      - "**"
+
+  researcher:
+    role: gather facts and write findings
+    owns:
+      - workspace/researcher/**
+    may_read:
+      - shared/**
+      - workspace/researcher/**
+
+  writer:
+    role: turn findings into a draft
+    owns:
+      - workspace/writer/**
+    may_read:
+      - shared/**
+      - workspace/researcher/**
+      - workspace/writer/**
+
+  reviewer:
+    role: review the draft and write a verdict
+    owns:
+      - workspace/reviewer/**
+    may_read:
+      - shared/**
+      - workspace/**
+      - inbox/**
+
+  demo:
+    role: reserved lane for examples/my_agent.py
+    owns:
+      - workspace/demo/**
+    may_read:
+      - shared/**
+      - workspace/demo/**
