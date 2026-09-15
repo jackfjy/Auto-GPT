@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "boundlab"
+version = "0.1.0"
+description = "A Python multi-agent lab with write territories so parallel agents cannot overwrite each other."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "BoundLab" }]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+]
+
+[project.scripts]
+boundlab = "boundlab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+boundlab = ["py.typed", "rules/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
