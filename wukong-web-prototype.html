@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>诚迈悟空 · 网页版</title>
 <style>
   :root {
@@ -67,7 +67,8 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  .app { height: 100%; display: flex; min-width: 1100px; }
+  .app { height: 100%; height: 100dvh; display: flex; min-width: 0; overflow: hidden; }
+  .main { position: relative; }
   .sidebar {
     width: var(--side-w);
     flex: none;
@@ -169,8 +170,9 @@
     height: 52px; flex: none; display: flex; align-items: center; gap: 8px;
     padding: 0 16px; border-bottom: 1px solid var(--line);
   }
-  .topbar h1 { font-size: 15px; font-weight: 650; margin: 0; }
-  .topbar p { margin: 0; color: var(--muted); font-size: 12px; }
+  .topbar > div { min-width: 0; }
+  .topbar h1 { font-size: 15px; font-weight: 650; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar p { margin: 0; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .spacer { flex: 1; }
   .iconbtn {
     border: 1px solid transparent; background: transparent; border-radius: 8px;
@@ -352,6 +354,7 @@
   .home-scroll { flex: 1; min-height: 0; overflow: auto; }
   .home-stage {
     min-height: calc(100vh - 52px);
+    min-height: calc(100dvh - 52px);
     display: flex; flex-direction: column;
     box-sizing: border-box; padding: 36px 28px 18px;
   }
@@ -497,6 +500,53 @@
   html[data-theme="ink"] .mac-who small { color: #98989d; }
   html[data-theme="ink"] .mac-main .ask { background: #2c2c2e; border-color: #3a3a3c; color: #f5f5f7; }
   html[data-theme="ink"] .mac-main .pm-lead { color: #f5f5f7; }
+  .side-backdrop { position: fixed; inset: 0; z-index: 25; border: 0; padding: 0; background: rgba(20, 16, 12, 0.42); }
+  @media (max-width: 1100px) {
+    .cards, .tcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 900px) {
+    .sidebar {
+      position: fixed; z-index: 26; top: 0; bottom: 0; left: 0;
+      width: min(300px, 88vw); box-shadow: var(--shadow);
+    }
+    .stage { position: relative; }
+    .panel { position: absolute; inset: 0; width: auto; z-index: 8; }
+    .yt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+    .page-inner, .plaza-wrap, .col, .composer-wrap { padding-left: 16px; padding-right: 16px; }
+    .home-stage { padding: 24px 16px 12px; }
+    .home-hero .greet { margin-bottom: 18px; }
+    .home-composer { margin-top: 16px; }
+    .notice { left: 12px; right: 12px; width: auto; }
+    .filters, .tabs { flex-wrap: nowrap; overflow-x: auto; }
+    .filters button, .tabs button { flex: none; }
+  }
+  @media (max-width: 640px) {
+    .cards, .tcards, .tiers, .choices, .suggests, .yt-grid { grid-template-columns: 1fr; }
+    .home-hero h2, .empty h2 { font-size: 28px; }
+    .piece h3 { font-size: 22px; }
+    .col { padding-top: 18px; }
+    .topbar { padding-left: 8px; padding-right: 8px; gap: 4px; }
+    .stat { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .stat b { font-size: 28px; }
+    .partner-modal, .modal { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
+    .modal { overflow: auto; }
+    .pm-foot { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    @media (max-width: 380px) { .pm-foot { flex-direction: column; } }
+    .side-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+    .composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    .home-more { margin-bottom: env(safe-area-inset-bottom); }
+    .mac-window {
+      width: 100%; height: 100%; height: 100dvh; border-radius: 0;
+      flex-direction: column;
+    }
+    .mac-side { width: auto; max-height: none; border-right: 0; border-bottom: 1px solid rgba(0,0,0,.08); }
+    .mac-nav { flex-direction: row; flex-wrap: wrap; overflow: visible; }
+    .mac-nav button { width: auto; flex: none; padding: 6px 8px; }
+    .mac-main { padding: 16px 16px 24px; }
+    input, textarea, select { font-size: 16px; }
+    table { display: block; overflow-x: auto; }
+  }
 </style>
 </head>
 <body>
@@ -696,6 +746,7 @@ function blankPersonalChat() {
   return thread;
 }
 function openAccount(tab) {
+  closeDrawer();
   state.accountTab = tab || state.accountTab || "home";
   state.modal = "account";
   state.noticeOpen = false;
@@ -753,7 +804,10 @@ function toast(msg) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => el.classList.remove("show"), 1800);
 }
+function narrow() { return window.matchMedia("(max-width: 900px)").matches; }
+function closeDrawer() { if (narrow()) state.collapsed = true; }
 function go(hash) {
+  closeDrawer();
   if (location.hash === hash) render();
   else location.hash = hash;
 }
@@ -1267,7 +1321,8 @@ function render() {
     : state.view === "plaza" ? plazaView()
     : chatView();
   const collapsed = state.collapsed ? "style=\"display:none\"" : "";
-  document.getElementById("app").innerHTML = (state.collapsed ? "" : sidebar()) + main + modalHtml();
+  const veil = !state.collapsed && narrow() ? `<button class="side-backdrop" data-act="collapse" aria-label="关闭菜单"></button>` : "";
+  document.getElementById("app").innerHTML = veil + (state.collapsed ? "" : sidebar()) + main + modalHtml();
   const q = document.getElementById("q");
   if (q && state.focus === "q") { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
   const composer = document.getElementById("composer");
@@ -1406,6 +1461,7 @@ document.addEventListener("keydown", event => {
 });
 window.addEventListener("hashchange", applyRoute);
 seed();
+if (narrow()) state.collapsed = true;
 if (!location.hash) location.hash = "#/chat/t-nanjing";
 else applyRoute();
 </script>
