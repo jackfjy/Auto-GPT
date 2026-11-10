@@ -430,6 +430,15 @@
   .ask span { min-width: 0; }
   .pm-foot { display: flex; gap: 10px; padding: 12px 16px 16px; border-top: 1px solid var(--line); flex: none; }
   .pm-foot .primary, .pm-foot .ghost { flex: 1; width: auto; border-radius: 999px; justify-content: center; }
+  .mine-sheet {
+    position: fixed; inset: 0; z-index: 28;
+    background: var(--bg); color: var(--ink);
+    display: flex; flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+  }
+  .mine-sheet .page { flex: 1; min-height: 0; }
+  .mine-sheet .page-inner { padding-top: 16px; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .mine-sheet .filters { flex-wrap: wrap; overflow: visible; margin-bottom: 16px; }
   .mac-back { background: rgba(28, 28, 30, 0.38); backdrop-filter: blur(10px); }
   .mac-window {
     width: min(980px, calc(100vw - 40px)); height: min(680px, calc(100vh - 48px));
@@ -536,14 +545,6 @@
     .side-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
     .composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     .home-more { margin-bottom: env(safe-area-inset-bottom); }
-    .mac-window {
-      width: 100%; height: 100%; height: 100dvh; border-radius: 0;
-      flex-direction: column;
-    }
-    .mac-side { width: auto; max-height: none; border-right: 0; border-bottom: 1px solid rgba(0,0,0,.08); }
-    .mac-nav { flex-direction: row; flex-wrap: wrap; overflow: visible; }
-    .mac-nav button { width: auto; flex: none; padding: 6px 8px; }
-    .mac-main { padding: 16px 16px 24px; }
     input, textarea, select { font-size: 16px; }
     table { display: block; overflow-x: auto; }
   }
@@ -1275,6 +1276,10 @@ function accountPane() {
   if (tab === "settings") return `<div class="label">主题皮肤</div><div class="row"><button class="ghost${state.theme==="paper"?" soft":""}" data-act="theme" data-id="paper">纸本${state.theme==="paper"?" · 使用中":""}</button><button class="ghost${state.theme==="ink"?" soft":""}" data-act="theme" data-id="ink">墨色${state.theme==="ink"?" · 使用中":""}</button></div><div class="list-row"><span>退出</span><button class="ghost" data-act="logout">退出登录</button></div>`;
   return `<div class="task"><h3>如何生成第一张图片？</h3><p>在创作小助手的对话里打开右侧创作台，选模板、写描述、看清龙豆，再放进对话确认。</p></div><div class="task" style="margin-top:8px"><h3>任务和作品在哪里？</h3><p>新对话的输入框下面就是广场。任务和我的作品仍在左侧资料库。生成过程中可以离开对话，进度留在任务里。</p></div><div class="task" style="margin-top:8px"><h3>关闭创作台会丢掉内容吗？</h3><p>不会自动生成。还没确认的参数留在右侧，确认之后才会扣龙豆。</p></div>`;
 }
+function mobileAccount() {
+  const current = ACCOUNT_TABS.find(t => t[0] === state.accountTab) || ACCOUNT_TABS[0];
+  return `<div class="mine-sheet" role="dialog" aria-label="我的"><header class="topbar"><button class="iconbtn" data-act="close-modal" aria-label="关闭">${icon("close")}</button><div><h1>我的</h1><p>${esc(current[1])}</p></div></header><div class="page"><div class="page-inner"><div class="filters">${ACCOUNT_TABS.map(([id, name]) => `<button class="${state.accountTab===id?"on":""}" data-act="account-tab" data-id="${id}">${name}</button>`).join("")}</div>${accountPane()}</div></div></div>`;
+}
 function macSettingsModal() {
   const q = (state.accountQuery || "").trim();
   const tabs = ACCOUNT_TABS.filter(t => !q || t[1].includes(q) || t[0].includes(q));
@@ -1299,7 +1304,7 @@ function pageShell(title, sub, inner) {
   return `<section class="main"><header class="topbar"><button class="iconbtn" data-act="collapse" aria-label="折叠侧栏">${icon("side")}</button><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></header><div class="page"><div class="page-inner">${inner}</div></div></section>`;
 }
 function modalHtml() {
-  if (state.modal === "account") return macSettingsModal();
+  if (state.modal === "account") return narrow() ? mobileAccount() : macSettingsModal();
   if (state.modal === "partner") return partnerModal();
   if (state.modal === "recharge") return `<div class="modal-back"><div class="modal" role="dialog" aria-label="购买龙豆"><h3>龙豆不足</h3><p class="meta">余额 ${beansText(state.beans)}。选择档位后只在这个原型里到账。</p><div class="tiers">${TIERS.slice(0,3).map(t => `<button class="card" data-act="tier" data-id="${t.id}"><b>${t.name}</b><i>${beansText(t.beans)} 龙豆 · ${t.price} 元</i></button>`).join("")}</div><div class="row" style="margin-top:12px"><button class="ghost" data-act="close-modal">取消</button><button class="textbtn" data-act="account" data-tab="beans">全部档位</button></div></div></div>`;
   if (state.modal === "vip") return `<div class="modal-back"><div class="modal" role="dialog"><h3>创作 VIP</h3><p>一键成片按每秒 12,000 龙豆，智能混剪每条 60,000 龙豆。普通会员不能使用这两项。</p><div class="row"><button class="ghost" data-act="close-modal">先不开通</button><button class="primary" style="width:auto" data-act="vip">在原型中开通</button></div></div></div>`;
