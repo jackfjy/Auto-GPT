@@ -352,17 +352,18 @@
   .home-scroll { flex: 1; min-height: 0; overflow: auto; }
   .home-stage {
     min-height: calc(100vh - 52px);
-    display: flex; align-items: center; justify-content: center;
-    position: relative; box-sizing: border-box; padding: 20px 28px 56px;
+    display: flex; flex-direction: column;
+    box-sizing: border-box; padding: 36px 28px 18px;
   }
-  .home-hero { width: min(780px, 100%); }
-  .home-hero h2 { font-family: var(--serif); font-size: 32px; font-weight: 600; margin: 0 0 6px; letter-spacing: 0.01em; }
-  .home-hero .greet { color: var(--muted); margin: 0 0 16px; }
-  .home-hero .composer-inner { max-width: none; }
-  .home-more {
-    position: absolute; left: 0; right: 0; bottom: 16px;
-    margin: 0; text-align: center; color: var(--faint); font-size: 12px;
+  .home-hero {
+    width: min(780px, 100%); margin: 0 auto; flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
   }
+  .home-hero h2 { font-family: var(--serif); font-size: 34px; font-weight: 600; margin: 0 0 10px; letter-spacing: 0.01em; }
+  .home-hero .greet { color: var(--muted); margin: 0 0 28px; }
+  .home-hero .suggests { gap: 12px; }
+  .home-composer { width: min(780px, 100%); margin: 28px auto 0; flex: none; }
+  .home-more { margin: 12px 0 0; text-align: center; color: var(--faint); font-size: 12px; }
   .plaza-wrap { width: 100%; margin: 0; padding: 8px 28px 48px; box-sizing: border-box; }
   .plaza-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 8px 0 14px; }
   .plaza-head h2 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
@@ -705,8 +706,6 @@ function openPartner(id) {
   const agent = AGENTS[id];
   if (!agent) return;
   state.partnerId = id;
-  state.partnerTab = "overview";
-  state.partnerQuery = "";
   state.modal = "partner";
   render();
 }
@@ -1093,8 +1092,8 @@ function chatView() {
             <h2>${esc(agent.greet)}</h2>
             <p class="greet">${esc(agent.role)} · ${esc(agent.source)}</p>
             <div class="suggests">${suggests}</div>
-            <div class="composer-inner" style="margin-top:16px">${composerBlock([], enterprise)}</div>
           </div>
+          <div class="home-composer composer-inner">${composerBlock([], enterprise)}</div>
           <p class="home-more">向下滚动，查看广场</p>
         </div>
         <div class="plaza-wrap">${plazaFeed()}</div>
@@ -1230,33 +1229,16 @@ function macSettingsModal() {
   const shown = ACCOUNT_TABS.find(t => t[0] === state.accountTab) || current;
   return `<div class="modal-back mac-back"><div class="mac-window" role="dialog" aria-label="我的"><aside class="mac-side"><div class="traffic"><button type="button" class="tl close" data-act="close-modal" aria-label="关闭"></button><span class="tl min" aria-hidden="true"></span><span class="tl max" aria-hidden="true"></span></div><label class="mac-search">${icon("search")}<input id="account-q" value="${esc(state.accountQuery || "")}" placeholder="搜索" aria-label="搜索设置" /></label><nav class="mac-nav">${tabs.map(([id,name,color,glyph]) => `<button type="button" class="${state.accountTab===id?"on":""}" data-act="account-tab" data-id="${id}"><span class="mac-ico" style="background:${color};color:${id==="help"?"#3a2a12":"#fff"}">${glyph}</span><span>${name}</span></button>`).join("") || `<p class="meta" style="padding:8px 10px">没有匹配的设置</p>`}</nav></aside><div class="mac-main"><h2>${esc(shown[1])}</h2><div class="mac-group">${accountPane()}</div></div></div></div>`;
 }
-const PARTNER_TABS = [
-  ["overview","概览","#0a84ff","概"],
-  ["domains","擅长领域","#ff9f0a","擅"],
-  ["asks","试试这样问","#30d158","问"],
-  ["ability","能力介绍","#bf5af2","能"]
-];
-function partnerPane(agent) {
-  const tab = state.partnerTab || "overview";
-  const asks = agentAsks(agent);
-  const domains = agent.domains || [agent.role];
-  const action = agent.retired
-    ? `<button class="ghost" disabled>已下架</button>`
-    : agent.owned
-      ? `<button class="primary" style="width:auto" data-act="use" data-id="${agent.id}">召唤工作伙伴</button>`
-      : `<button class="primary" style="width:auto" data-act="sub" data-id="${agent.id}">${agent.cost ? "领取 · " + esc(agent.price) : "领取"}</button>`;
-  if (tab === "domains") return `<div class="chips">${domains.map(d => `<span class="tag">${esc(d)}</span>`).join("")}</div><p class="meta" style="margin-top:12px">${esc(agent.source)} · ${esc(agent.cat)}</p>`;
-  if (tab === "asks") return asks.map(q => `<button class="ask" data-act="ask-agent" data-id="${agent.id}" data-text="${esc(q)}"><span>“${esc(q)}”</span><span aria-hidden="true">›</span></button>`).join("");
-  if (tab === "ability") return `<p class="pm-lead">${esc(agentAbility(agent))}</p>`;
-  return `<p class="pm-lead">${esc(agent.about)}</p><div class="list-row"><span>来源</span><span class="meta">${esc(agent.source)}</span></div><div class="list-row"><span>使用次数</span><span class="meta">${esc(agent.uses)}</span></div><div class="list-row"><span>领取方式</span><span class="meta">${esc(agent.price)}</span></div><div class="row" style="margin-top:16px"><button class="ghost" data-act="share-partner">分享</button>${action}</div>`;
-}
 function partnerModal() {
   const a = AGENTS[state.partnerId] || AGENTS.creator;
-  const q = (state.partnerQuery || "").trim();
-  const tabs = PARTNER_TABS.filter(t => !q || t[1].includes(q));
-  if (!tabs.some(t => t[0] === (state.partnerTab || "overview")) && tabs[0]) state.partnerTab = tabs[0][0];
-  const shown = PARTNER_TABS.find(t => t[0] === (state.partnerTab || "overview")) || PARTNER_TABS[0];
-  return `<div class="modal-back mac-back"><div class="mac-window" role="dialog" aria-label="工作伙伴详情"><aside class="mac-side"><div class="traffic"><button type="button" class="tl close" data-act="close-modal" aria-label="关闭"></button><span class="tl min" aria-hidden="true"></span><span class="tl max" aria-hidden="true"></span></div><div class="mac-who"><div class="pm-avatar">${esc(a.name.slice(0,1))}</div><strong>${esc(a.name)}</strong><small>${esc(a.role)}</small></div><label class="mac-search">${icon("search")}<input id="partner-q" value="${esc(state.partnerQuery || "")}" placeholder="搜索" aria-label="搜索伙伴详情" /></label><nav class="mac-nav">${tabs.map(([id,name,color,glyph]) => `<button type="button" class="${(state.partnerTab||"overview")===id?"on":""}" data-act="partner-tab" data-id="${id}"><span class="mac-ico" style="background:${color}">${glyph}</span><span>${name}</span></button>`).join("") || `<p class="meta" style="padding:8px 10px">没有匹配的栏目</p>`}</nav></aside><div class="mac-main"><h2>${esc(shown[1])}</h2><div class="mac-group">${partnerPane(a)}</div></div></div></div>`;
+  const asks = agentAsks(a);
+  const domains = a.domains || [a.role];
+  const action = a.retired
+    ? `<button class="ghost" disabled>已下架</button>`
+    : a.owned
+      ? `<button class="primary" data-act="use" data-id="${a.id}">召唤工作伙伴</button>`
+      : `<button class="primary" data-act="sub" data-id="${a.id}">${a.cost ? "领取 · " + esc(a.price) : "领取"}</button>`;
+  return `<div class="modal-back"><div class="modal partner-modal" role="dialog" aria-label="工作伙伴详情"><div class="pm-head"><strong>工作伙伴详情</strong><span class="spacer"></span><button class="iconbtn" data-act="close-modal" aria-label="关闭">${icon("close")}</button></div><div class="pm-body"><div class="pm-hero"><div class="pm-avatar">${esc(a.name.slice(0,1))}</div><h3>${esc(a.name)}</h3><p class="meta">${esc(a.uses)} 次使用 · ${esc(a.source)} · ${esc(a.price)}</p></div><p style="margin:16px 0 0;line-height:1.75">${esc(a.about)}</p><section class="pm-sec"><h4><i></i>擅长领域</h4><div class="chips">${domains.map(d => `<span class="tag">${esc(d)}</span>`).join("")}</div></section><section class="pm-sec"><h4><i></i>试试这样问我</h4>${asks.map(q => `<button class="ask" data-act="ask-agent" data-id="${a.id}" data-text="${esc(q)}"><span>“${esc(q)}”</span><span aria-hidden="true">›</span></button>`).join("")}</section><section class="pm-sec"><h4><i></i>能力介绍</h4><p style="margin:0;line-height:1.75;white-space:pre-wrap">${esc(agentAbility(a))}</p></section></div><div class="pm-foot"><button class="ghost" data-act="share-partner">分享</button>${action}</div></div></div>`;
 }
 function pageShell(title, sub, inner) {
   const hash = location.hash;
@@ -1292,8 +1274,6 @@ function render() {
   if (composer && state.focus === "composer") composer.focus();
   const aq = document.getElementById("account-q");
   if (aq && state.focus === "account-q") { aq.focus(); aq.setSelectionRange(aq.value.length, aq.value.length); }
-  const pq = document.getElementById("partner-q");
-  if (pq && state.focus === "partner-q") { pq.focus(); pq.setSelectionRange(pq.value.length, pq.value.length); }
 }
 
 function textOfMessage(m) {
@@ -1310,7 +1290,6 @@ function onAct(act, el) {
   }
   if (act === "account") return openAccount(el.dataset.tab || "home");
   if (act === "account-tab") { state.accountTab = id || "home"; state.modal = "account"; return render(); }
-  if (act === "partner-tab") { state.partnerTab = id || "overview"; state.modal = "partner"; return render(); }
   if (act === "open-partner") return openPartner(id);
   if (act === "share-partner") return toast("链接已复制");
   if (act === "ask-agent") {
@@ -1402,7 +1381,6 @@ document.getElementById("app").addEventListener("submit", event => {
 document.getElementById("app").addEventListener("input", event => {
   if (event.target.id === "q") { state.q = event.target.value; state.focus = "q"; render(); }
   if (event.target.id === "account-q") { state.accountQuery = event.target.value; state.focus = "account-q"; render(); }
-  if (event.target.id === "partner-q") { state.partnerQuery = event.target.value; state.focus = "partner-q"; render(); }
   if (event.target.id === "composer") state.draft = event.target.value;
   if (event.target.id === "product") state.product = event.target.value;
   if (event.target.id === "points") state.points = event.target.value;
