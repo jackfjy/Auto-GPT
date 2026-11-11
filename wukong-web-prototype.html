@@ -353,8 +353,8 @@
   .claim:disabled { opacity: 0.55; cursor: default; }
   .home-scroll { flex: 1; min-height: 0; overflow: auto; }
   .home-stage {
-    min-height: calc(100vh - 52px - 148px);
-    min-height: calc(100dvh - 52px - 148px);
+    min-height: calc(100vh - 52px - 56px);
+    min-height: calc(100dvh - 52px - 56px);
     display: flex; flex-direction: column;
     box-sizing: border-box; padding: 36px 28px 8px;
   }
@@ -367,11 +367,11 @@
   .home-hero .suggests { gap: 12px; }
   .home-composer { width: min(780px, 100%); margin: 28px auto 0; flex: none; }
   .yt-bar {
-    position: sticky; top: 0; z-index: 5;
+    position: sticky; top: 0; z-index: 5; flex: none;
     display: flex; align-items: center; gap: 8px;
-    min-height: 56px; padding: 10px 16px 10px 20px;
-    background: var(--bg); border-top: 1px solid var(--line);
-    box-shadow: 0 10px 18px rgba(40, 32, 22, 0.05);
+    height: 56px; padding: 0 16px 0 20px;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    box-shadow: 0 8px 16px rgba(40, 32, 22, 0.05);
   }
   .yt-bar-scroll {
     display: flex; gap: 12px; overflow-x: auto; flex: 1; min-width: 0;
@@ -398,7 +398,7 @@
   .yt-bar-next { background: var(--paper); color: var(--ink); box-shadow: 0 1px 6px rgba(0,0,0,.18); }
   .yt-bar-down { background: var(--ink); color: var(--paper); }
   html[data-theme="ink"] .yt-bar-down { color: #141311; }
-  .plaza-wrap { width: 100%; margin: 0; padding: 8px 28px 48px; box-sizing: border-box; }
+  .plaza-wrap { width: 100%; margin: 0; padding: 16px 28px 48px; box-sizing: border-box; min-height: calc(100dvh - 52px - 56px); }
   .plaza-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 8px 0 14px; }
   .plaza-head h2 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
   .plaza-head p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
@@ -1174,6 +1174,7 @@ function chatView() {
   if (showPlaza) {
     const suggests = (skills.length ? skills : SKILLS.wukong).map(s => `<button data-act="skill" data-id="${esc(s.id)}" data-hint="${esc(s.hint || s.name)}" data-tab="${esc(s.tab || "")}"><b>${esc(s.name)}</b><small>${esc(s.hint || agent.about)}</small></button>`).join("");
     return `<section class="main">${topbar}
+      ${ytBar()}
       <div class="home-scroll" id="home-scroll">
         <div class="home-stage">
           <div class="home-hero">
@@ -1183,7 +1184,6 @@ function chatView() {
           </div>
           <div class="home-composer composer-inner">${composerBlock([], enterprise)}</div>
         </div>
-        ${ytBar()}
         <div class="plaza-wrap">${plazaFeed()}</div>
       </div>
       ${state.noticeOpen ? notices() : ""}
@@ -1271,7 +1271,9 @@ function ytBar() {
 function revealPlaza() {
   const sc = document.getElementById("home-scroll");
   const plaza = document.querySelector(".plaza-wrap");
-  if (sc && plaza) sc.scrollTo({ top: Math.max(0, plaza.offsetTop - 56), behavior: "smooth" });
+  if (!sc || !plaza) return;
+  const top = plaza.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
+  sc.scrollTo({ top, behavior: "smooth" });
 }
 function plazaFeed() {
   return mediaCards(state.works.filter(matchesPlaza));
