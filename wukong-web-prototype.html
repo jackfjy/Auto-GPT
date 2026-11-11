@@ -1,0 +1,1538 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>诚迈悟空 · 网页版</title>
+<style>
+  :root {
+    --bg: #f3f1eb;
+    --side: #ebe7df;
+    --paper: #fbfaf6;
+    --ink: #1e1b17;
+    --muted: #6f675e;
+    --faint: #8a8176;
+    --line: #e3dcd1;
+    --line-strong: #d4cbbf;
+    --accent: #0e5c68;
+    --accent-ink: #084852;
+    --accent-soft: #e5f2f3;
+    --accent-line: #c5e0e3;
+    --user: #e7eef0;
+    --warn: #8a3d12;
+    --warn-soft: #f8efe6;
+    --good: #1d6b45;
+    --good-soft: #e7f4ec;
+    --danger: #8f2d2d;
+    --shadow: 0 16px 40px rgba(40, 32, 22, 0.12);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", serif;
+    --sans: "Noto Sans SC", "WenQuanYi Micro Hei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    --side-w: 268px;
+    --panel-w: 400px;
+    --radius: 10px;
+  }
+  html[data-theme="ink"] {
+    --bg: #141311;
+    --side: #1b1916;
+    --paper: #211f1c;
+    --ink: #f4efe8;
+    --muted: #b7aea3;
+    --faint: #8f877d;
+    --line: #34302a;
+    --line-strong: #463f36;
+    --accent: #8fd0cb;
+    --accent-ink: #d7f4f1;
+    --accent-soft: #1b3032;
+    --accent-line: #2d4c4e;
+    --user: #2a3336;
+    --warn: #f0c09a;
+    --warn-soft: #3a2b22;
+    --good: #9ddec0;
+    --good-soft: #1a3126;
+    --danger: #f0b4b4;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .app { height: 100%; height: 100dvh; display: flex; min-width: 0; overflow: hidden; }
+  .main { position: relative; }
+  .sidebar {
+    width: var(--side-w);
+    flex: none;
+    background: var(--side);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .side-top, .side-foot { padding: 14px 12px 10px; }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 2px 6px 12px;
+  }
+  .mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent); color: #f7fffe;
+    display: grid; place-items: center;
+    font-family: var(--serif); font-weight: 650; font-size: 16px;
+  }
+  html[data-theme="ink"] .mark { color: #102022; }
+  .brand strong { display: block; font-size: 14px; font-weight: 650; letter-spacing: 0.01em; }
+  .brand small { color: var(--muted); font-size: 12px; }
+  .primary, .ghost, .soft, .textbtn {
+    border: 1px solid transparent; background: transparent; border-radius: 8px;
+  }
+  .primary {
+    width: 100%;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    background: var(--ink); color: var(--paper);
+    padding: 8px 10px; font-weight: 600;
+  }
+  .sidebar .primary { justify-content: flex-start; }
+  html[data-theme="ink"] .primary { background: var(--accent); color: #102022; }
+  .ghost {
+    border-color: var(--line-strong); background: var(--paper);
+    padding: 7px 10px;
+  }
+  .soft { background: var(--accent-soft); color: var(--accent-ink); padding: 6px 10px; }
+  .textbtn { color: var(--muted); padding: 4px 6px; }
+  .textbtn:hover, .nav:hover, .thread:hover, .side-link:hover { background: rgba(30, 27, 23, 0.05); }
+  html[data-theme="ink"] .textbtn:hover,
+  html[data-theme="ink"] .nav:hover,
+  html[data-theme="ink"] .thread:hover,
+  html[data-theme="ink"] .side-link:hover { background: rgba(255,255,255,0.05); }
+  .search {
+    margin: 8px 0 4px; display: flex; align-items: center; gap: 6px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px;
+  }
+  .search input { border: 0; outline: none; width: 100%; background: transparent; }
+  .search kbd, .hint kbd {
+    font-family: var(--sans); font-size: 11px; color: var(--faint);
+    border: 1px solid var(--line); border-radius: 4px; padding: 0 4px;
+  }
+  .ws { position: relative; margin: 8px 0; }
+  .ws > button {
+    width: 100%; display: flex; gap: 8px; align-items: center;
+    text-align: left; background: transparent; border: 1px solid var(--line);
+    border-radius: 8px; padding: 7px 8px;
+  }
+  .ws small { display: block; color: var(--muted); }
+  .ws-menu {
+    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px);
+    background: var(--paper); border: 1px solid var(--line-strong); border-radius: 10px;
+    box-shadow: var(--shadow); padding: 6px;
+  }
+  .ws-menu button, .menu button {
+    display: block; width: 100%; text-align: left; border: 0; background: transparent;
+    border-radius: 7px; padding: 7px 8px;
+  }
+  .ws-menu button.on, .menu button:hover { background: var(--accent-soft); }
+  .library { padding: 0 8px 6px; border-bottom: 1px solid var(--line); }
+  .library .label { padding-top: 2px; }
+  .library .side-link { padding: 5px 8px; }
+  .scroll { overflow: auto; min-height: 0; flex: 1; padding: 0 8px 8px; }
+  .label { color: var(--faint); font-size: 12px; padding: 10px 8px 4px; }
+  .thread, .side-link, .nav {
+    width: 100%; display: flex; gap: 8px; align-items: center;
+    text-align: left; border: 0; background: transparent; border-radius: 8px; padding: 7px 8px;
+  }
+  .thread.on, .side-link.on, .nav.on { background: var(--paper); }
+  .thread .t { min-width: 0; flex: 1; }
+  .thread strong, .side-link span, .nav span { display: block; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread em { display: block; font-style: normal; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dot {
+    width: 22px; height: 22px; border-radius: 6px; flex: none;
+    display: grid; place-items: center; font-size: 12px; background: var(--accent-soft); color: var(--accent-ink);
+  }
+  .side-foot { border-top: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #c9b59a; color: #2b241c;
+    display: grid; place-items: center; font-weight: 650; flex: none;
+  }
+  .side-foot .who { flex: 1; min-width: 0; }
+  .side-foot strong { display: block; }
+  .side-foot small { color: var(--muted); }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bg); }
+  .topbar {
+    height: 52px; flex: none; display: flex; align-items: center; gap: 8px;
+    padding: 0 16px; border-bottom: 1px solid var(--line);
+  }
+  .topbar > div { min-width: 0; }
+  .topbar h1 { font-size: 15px; font-weight: 650; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar p { margin: 0; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .spacer { flex: 1; }
+  .iconbtn {
+    border: 1px solid transparent; background: transparent; border-radius: 8px;
+    padding: 6px 8px; color: var(--muted);
+  }
+  .iconbtn:hover { background: rgba(30,27,23,0.05); }
+  .stage { flex: 1; min-height: 0; display: flex; }
+  .transcript { flex: 1; min-width: 0; overflow: auto; display: flex; flex-direction: column; }
+  .col { width: min(780px, 100%); margin: 0 auto; padding: 28px 28px 12px; }
+  .col.empty { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .empty h2 { font-family: var(--serif); font-size: 32px; font-weight: 600; margin: 0 0 8px; letter-spacing: 0.01em; }
+  .empty .greet { color: var(--muted); margin: 0 0 18px; }
+  .suggests { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .suggests button, .follow button, .chips button, .seg button, .choice {
+    text-align: left; border: 1px solid var(--line); background: var(--paper);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .suggests button:hover, .follow button:hover, .choice:hover { border-color: var(--accent-line); }
+  .suggests small { display: block; color: var(--faint); }
+  .msg { margin: 0 0 22px; }
+  .msg.user { display: flex; justify-content: flex-end; }
+  .bubble {
+    max-width: 86%; background: var(--user); border-radius: 12px; padding: 10px 14px; white-space: pre-wrap;
+  }
+  .who-line { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .piece h3 { font-family: var(--serif); font-size: 26px; line-height: 1.35; margin: 6px 0 8px; }
+  .lead { margin: 0; }
+  blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--accent); color: var(--accent-ink); }
+  .actions, .follow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .task, .cite, .handoff, .pagecard, .perm {
+    border: 1px solid var(--line); background: var(--paper); border-radius: 12px; padding: 14px;
+  }
+  .kicker { color: var(--accent-ink); font-size: 12px; font-weight: 650; }
+  .task h3, .cite h3, .pagecard h3 { margin: 4px 0 6px; font-size: 16px; }
+  .meta { color: var(--muted); margin: 0; }
+  .cost { font-variant-numeric: tabular-nums; margin: 8px 0; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .cite li { margin: 4px 0; }
+  .srcbtn { border: 0; background: transparent; color: var(--accent-ink); padding: 0; text-decoration: underline; cursor: pointer; }
+  .composer-wrap { flex: none; padding: 0 28px 16px; }
+  .composer-inner { max-width: 780px; margin: 0 auto; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .chips button { padding: 4px 10px; border-radius: 999px; background: transparent; }
+  .chips button.on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-ink); }
+  .composer {
+    background: var(--paper); border: 1px solid var(--line-strong); border-radius: 14px; padding: 8px;
+  }
+  .composer textarea {
+    width: 100%; border: 0; resize: none; outline: none; background: transparent;
+    min-height: 48px; max-height: 160px; padding: 6px 6px 0;
+  }
+  .composer-bar { display: flex; align-items: center; gap: 4px; }
+  .hint { margin: 6px 2px 0; color: var(--faint); font-size: 12px; }
+  .send {
+    margin-left: auto; background: var(--accent); color: #f4fffe; border: 0; border-radius: 8px; padding: 6px 12px; font-weight: 650;
+  }
+  html[data-theme="ink"] .send { color: #102022; }
+  .send:disabled { opacity: 0.4; cursor: default; }
+  .panel {
+    width: var(--panel-w); flex: none; background: var(--paper);
+    border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0;
+  }
+  .panel header, .page-head {
+    height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 14px;
+    border-bottom: 1px solid var(--line); flex: none;
+  }
+  .panel header strong { font-size: 14px; }
+  .panel .body { overflow: auto; padding: 14px; flex: 1; min-height: 0; }
+  .tabs { display: flex; gap: 4px; padding: 0 0 12px; }
+  .tabs button { border: 0; background: transparent; color: var(--muted); border-radius: 7px; padding: 6px 8px; }
+  .tabs button.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
+  .field { margin: 0 0 12px; }
+  .field span, .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .field input, .field textarea, .field select {
+    width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px;
+  }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .choice.on { border-color: var(--accent); background: var(--accent-soft); }
+  .choice b { display: block; font-weight: 600; }
+  .choice i { display: block; font-style: normal; color: var(--muted); font-size: 12px; }
+  .upload {
+    border: 1px dashed var(--line-strong); border-radius: 10px; padding: 14px; color: var(--muted); text-align: center;
+  }
+  .sticky-cta {
+    flex: none; padding: 12px 14px; border-top: 1px solid var(--line); background: var(--paper);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .page { flex: 1; min-width: 0; overflow: auto; }
+  .page-inner { padding: 22px 28px 40px; }
+  .page h2 { margin: 0; font-size: 22px; }
+  .sub { color: var(--muted); margin: 4px 0 16px; }
+  .filters { display: flex; gap: 6px; margin-bottom: 14px; }
+  .filters button, .subnav button {
+    border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 10px;
+  }
+  .filters button.on, .subnav button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  html[data-theme="ink"] .filters button.on, html[data-theme="ink"] .subnav button.on { background: var(--accent); color: #102022; border-color: var(--accent); }
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .card {
+    text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 12px; padding: 14px;
+  }
+  .card:hover { border-color: var(--accent-line); }
+  .card h3 { margin: 8px 0 4px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); min-height: 44px; }
+  .tag { display: inline-block; font-size: 12px; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; }
+  .tag.warn { color: var(--warn); background: var(--warn-soft); }
+  .tag.muted { color: var(--muted); background: transparent; border: 1px solid var(--line); }
+  .works { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .work { border: 0; padding: 0; background: transparent; text-align: left; }
+  .art {
+    height: 168px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 4px; padding: 12px;
+    color: #f7f4ee;
+  }
+  .art span { font-size: 12px; opacity: 0.8; }
+  .art b { font-size: 16px; font-weight: 650; }
+  .work small, .taskline small { color: var(--muted); }
+  .taskline {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 12px;
+    border: 1px solid var(--line); background: var(--paper); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+  }
+  .bar { height: 4px; background: var(--line); border-radius: 99px; grid-column: 1 / -1; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .split { display: grid; grid-template-columns: 180px 1fr; gap: 22px; }
+  .detail { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 22px; align-items: start; }
+  .subnav { display: flex; flex-direction: column; gap: 4px; }
+  .subnav button { border-radius: 8px; text-align: left; }
+  .stat {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding: 16px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); margin-bottom: 12px;
+  }
+  .stat b { font-family: var(--serif); font-size: 32px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; background: var(--paper); }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-weight: 450; }
+  th { color: var(--muted); font-size: 12px; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .notice {
+    position: absolute; right: 16px; top: 48px; width: 320px; z-index: 6;
+    background: var(--paper); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); padding: 8px;
+  }
+  .notice button { display: block; width: 100%; text-align: left; border: 0; background: transparent; border-radius: 8px; padding: 8px; }
+  .notice button strong { display: block; }
+  .notice button span { color: var(--muted); }
+  .modal-back {
+    position: fixed; inset: 0; background: rgba(24, 20, 16, 0.46);
+    display: flex; align-items: center; justify-content: center; z-index: 20;
+  }
+  .modal { width: min(520px, calc(100vw - 40px)); background: var(--paper); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
+  .modal h3 { margin: 0 0 6px; font-size: 18px; }
+  .call { text-align: center; padding: 12px 8px 4px; }
+  .call .pulse {
+    width: 72px; height: 72px; margin: 8px auto 10px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--accent); color: #f4fffe; font-family: var(--serif); font-size: 28px;
+  }
+  html[data-theme="ink"] .call .pulse { color: #102022; }
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(12px);
+    background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 999px;
+    opacity: 0; pointer-events: none; transition: 0.18s ease; z-index: 40;
+  }
+  html[data-theme="ink"] #toast { background: var(--accent); color: #102022; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .switch { width: 36px; height: 22px; border-radius: 99px; border: 0; background: var(--line-strong); position: relative; }
+  .switch.on { background: var(--accent); }
+  .switch i { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; }
+  .switch.on i { left: 17px; }
+  .perm-row, .list-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .partner-card { display: flex; flex-direction: column; align-items: stretch; cursor: default; }
+  .partner-card:hover { border-color: var(--line); }
+  .partner-card h3 { margin-top: 10px; }
+  .partner-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .partner-av {
+    width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
+    background: var(--accent); color: #f4fffe; font-family: var(--serif); font-size: 20px; flex: none;
+  }
+  html[data-theme="ink"] .partner-av { color: #102022; }
+  .claim { margin-top: 12px; width: 100%; border-radius: 999px; }
+  .claim.owned, html[data-theme="ink"] .claim.owned { background: transparent; color: var(--accent-ink); border: 1px solid var(--accent-line); }
+  .claim:disabled { opacity: 0.55; cursor: default; }
+  .home-scroll { flex: 1; min-height: 0; overflow: auto; }
+  .home-stage {
+    min-height: calc(100vh - 52px - 56px);
+    min-height: calc(100dvh - 52px - 56px);
+    display: flex; flex-direction: column;
+    box-sizing: border-box; padding: 36px 28px 8px;
+  }
+  .home-hero {
+    width: min(780px, 100%); margin: 0 auto; flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .home-hero h2 { font-family: var(--serif); font-size: 34px; font-weight: 600; margin: 0 0 10px; letter-spacing: 0.01em; }
+  .home-hero .greet { color: var(--muted); margin: 0 0 28px; }
+  .home-hero .suggests { gap: 12px; }
+  .home-composer { width: min(780px, 100%); margin: 28px auto 0; flex: none; }
+  .yt-bar {
+    position: sticky; top: 0; z-index: 5; flex: none;
+    display: flex; align-items: center; gap: 8px;
+    height: 56px; padding: 0 16px 0 20px;
+    background: var(--bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    box-shadow: 0 -8px 16px rgba(40, 32, 22, 0.04), 0 8px 16px rgba(40, 32, 22, 0.05);
+  }
+  .yt-bar-scroll {
+    display: flex; gap: 12px; overflow-x: auto; flex: 1; min-width: 0;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  }
+  .yt-bar-scroll::-webkit-scrollbar { display: none; }
+  .yt-chip {
+    flex: none; height: 32px; padding: 0 12px; border: 0; border-radius: 8px;
+    background: rgba(30, 27, 23, 0.06); color: var(--ink);
+    font-size: 14px; font-weight: 550; line-height: 32px; white-space: nowrap;
+  }
+  .yt-chip.on { background: var(--ink); color: var(--paper); }
+  .yt-chip:hover { background: rgba(30, 27, 23, 0.12); }
+  .yt-chip.on:hover { background: var(--ink); }
+  html[data-theme="ink"] .yt-chip { background: rgba(255,255,255,.1); }
+  html[data-theme="ink"] .yt-chip:hover { background: rgba(255,255,255,.16); }
+  html[data-theme="ink"] .yt-chip.on, html[data-theme="ink"] .yt-chip.on:hover { background: var(--ink); color: #141311; }
+  .yt-bar-next, .yt-bar-down {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0;
+    display: grid; place-items: center;
+  }
+  .yt-bar-next { background: var(--paper); color: var(--ink); box-shadow: 0 1px 6px rgba(0,0,0,.18); }
+  .yt-bar-down { background: var(--ink); color: var(--paper); }
+  html[data-theme="ink"] .yt-bar-down { color: #141311; }
+  .plaza-wrap { width: 100%; margin: 0; padding: 16px 28px 48px; box-sizing: border-box; min-height: calc(100dvh - 52px - 56px); }
+  .plaza-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 8px 0 14px; }
+  .plaza-head h2 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
+  .plaza-head p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  .yt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 36px 16px; }
+  .yt-card { min-width: 0; }
+  .yt-thumb {
+    position: relative; display: block; width: 100%; padding: 0; border: 0;
+    border-radius: 12px; overflow: hidden; background: #0f0f0f; aspect-ratio: 16 / 9; cursor: pointer;
+  }
+  .yt-thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .yt-thumb:hover { filter: brightness(0.94); }
+  .vbadge {
+    position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.82); color: #fff;
+    font-size: 12px; font-weight: 650; border-radius: 4px; padding: 2px 5px; font-variant-numeric: tabular-nums;
+  }
+  .yt-meta { display: flex; gap: 12px; margin-top: 12px; align-items: flex-start; }
+  .yt-av {
+    width: 36px; height: 36px; border-radius: 50%; background: #c9b59a; color: #2b241c;
+    display: grid; place-items: center; font-size: 14px; font-weight: 650; flex: none;
+  }
+  .yt-copy { min-width: 0; }
+  .yt-title {
+    margin: 0; font-size: 15px; font-weight: 650; line-height: 1.35; letter-spacing: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .yt-sub { color: var(--muted); font-size: 13px; line-height: 1.35; }
+  .tcards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .tcard { border: 1px solid var(--line); background: var(--paper); border-radius: 12px; overflow: hidden; text-align: left; }
+  .tthumb { position: relative; background: #111; }
+  .tthumb svg { display: block; width: 100%; height: auto; }
+  .tcard .pad { padding: 10px 12px 12px; }
+  .tcard h3 { margin: 0 0 8px; font-size: 15px; line-height: 1.4; }
+  .tmeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .tprog { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .partner-modal {
+    width: min(640px, calc(100vw - 40px)); max-height: min(780px, calc(100vh - 48px));
+    display: flex; flex-direction: column; padding: 0; overflow: hidden;
+  }
+  .pm-head {
+    display: flex; align-items: center; gap: 8px; padding: 14px 16px 0; flex: none;
+  }
+  .pm-head strong { font-size: 15px; }
+  .pm-body { overflow: auto; padding: 8px 22px 18px; min-height: 0; }
+  .pm-hero { text-align: center; padding-top: 6px; }
+  .pm-avatar {
+    width: 84px; height: 84px; border-radius: 26px; margin: 0 auto;
+    display: grid; place-items: center; font-size: 34px; background: var(--accent); color: #f4fffe;
+    font-family: var(--serif);
+  }
+  html[data-theme="ink"] .pm-avatar { color: #102022; }
+  .pm-hero h3 { margin: 12px 0 0; font-size: 22px; }
+  .pm-sec { margin-top: 18px; }
+  .pm-sec h4 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .pm-sec h4 i { width: 3px; height: 14px; border-radius: 99px; background: var(--accent); display: block; }
+  .ask {
+    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 8px;
+    text-align: left; border: 1px solid var(--line); background: var(--bg);
+    border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  .ask span { min-width: 0; }
+  .pm-foot { display: flex; gap: 10px; padding: 12px 16px 16px; border-top: 1px solid var(--line); flex: none; }
+  .pm-foot .primary, .pm-foot .ghost { flex: 1; width: auto; border-radius: 999px; justify-content: center; }
+  .mine-sheet {
+    position: fixed; inset: 0; z-index: 28;
+    background: var(--bg); color: var(--ink);
+    display: flex; flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+  }
+  .mine-sheet .page { flex: 1; min-height: 0; }
+  .mine-sheet .page-inner { padding-top: 16px; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .mine-sheet .filters { flex-wrap: wrap; overflow: visible; margin-bottom: 16px; }
+  .mac-back { background: rgba(28, 28, 30, 0.38); backdrop-filter: blur(10px); }
+  .mac-window {
+    width: min(980px, calc(100vw - 40px)); height: min(680px, calc(100vh - 48px));
+    display: flex; padding: 0; overflow: hidden; border-radius: 12px;
+    background: #f5f5f7; color: #1d1d1f;
+    box-shadow: 0 28px 80px rgba(0,0,0,.32), 0 0 0 1px rgba(0,0,0,.12);
+  }
+  .mac-side {
+    width: 236px; flex: none; background: #ececef; display: flex; flex-direction: column;
+    padding: 14px 10px 16px; border-right: 1px solid rgba(0,0,0,.06);
+  }
+  .traffic { display: flex; gap: 8px; align-items: center; padding: 0 8px 12px; }
+  .tl { width: 12px; height: 12px; border-radius: 50%; border: 0; padding: 0; display: block; }
+  .tl.close { background: #ff5f57; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,.15); }
+  .tl.min { background: #febc2e; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,.12); }
+  .tl.max { background: #28c840; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,.12); }
+  .mac-search {
+    margin: 0 6px 10px; background: rgba(255,255,255,.72); border-radius: 7px;
+    border: 1px solid rgba(0,0,0,.08); display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+    color: #8e8e93;
+  }
+  .mac-search input { border: 0; outline: none; background: transparent; width: 100%; color: #1d1d1f; font-size: 13px; }
+  .mac-nav { display: flex; flex-direction: column; gap: 2px; overflow: auto; }
+  .mac-nav button {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    border: 0; background: transparent; border-radius: 7px; padding: 5px 8px;
+    text-align: left; color: #1d1d1f; font-size: 13px;
+  }
+  .mac-nav button.on { background: rgba(0,0,0,.08); }
+  .mac-nav button:hover { background: rgba(0,0,0,.05); }
+  .mac-nav button.on:hover { background: rgba(0,0,0,.1); }
+  .mac-ico { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: #fff; flex: none; }
+  .mac-main { flex: 1; min-width: 0; overflow: auto; padding: 26px 32px 32px; background: #f5f5f7; }
+  .mac-main h2 { margin: 0 0 14px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #1d1d1f; }
+  .mac-group { background: #fff; border-radius: 10px; padding: 4px 14px; margin-bottom: 14px; }
+  .mac-main .stat, .mac-main .card, .mac-main .task, .mac-main table { background: #fff; color: #1d1d1f; }
+  .mac-main .meta, .mac-main .sub, .mac-main small { color: #6e6e73; }
+  .mac-main .field input, .mac-main .field textarea { background: #f5f5f7; color: #1d1d1f; border-color: #e3e3e8; }
+  .mac-main .ghost { background: #f5f5f7; color: #1d1d1f; border-color: #d8d8de; }
+  .mac-main .primary { background: #1d1d1f; color: #fff; }
+  .mac-main .tag { color: #0b5cab; background: #e7f1fb; }
+  .mac-main th, .mac-main td { border-bottom-color: #ececf0; }
+  .mac-main .list-row, .mac-main .perm-row { border-bottom-color: #ececf0; }
+  html[data-theme="ink"] .mac-window { background: #1e1e20; color: #f5f5f7; box-shadow: 0 28px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); }
+  html[data-theme="ink"] .mac-side { background: #2a2a2d; border-right-color: rgba(255,255,255,.06); }
+  html[data-theme="ink"] .mac-search { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.08); color: #98989d; }
+  html[data-theme="ink"] .mac-search input { color: #f5f5f7; }
+  html[data-theme="ink"] .mac-nav button { color: #f5f5f7; }
+  html[data-theme="ink"] .mac-nav button.on { background: rgba(255,255,255,.12); }
+  html[data-theme="ink"] .mac-main { background: #1e1e20; }
+  html[data-theme="ink"] .mac-main h2 { color: #f5f5f7; }
+  html[data-theme="ink"] .mac-group { background: #2c2c2e; }
+  html[data-theme="ink"] .mac-main .stat,
+  html[data-theme="ink"] .mac-main .card,
+  html[data-theme="ink"] .mac-main .task,
+  html[data-theme="ink"] .mac-main table { background: #2c2c2e; color: #f5f5f7; }
+  html[data-theme="ink"] .mac-main .ghost { background: #3a3a3c; color: #f5f5f7; border-color: #4a4a4e; }
+  html[data-theme="ink"] .mac-main .primary { background: #f5f5f7; color: #1d1d1f; }
+  html[data-theme="ink"] .mac-main .field input,
+  html[data-theme="ink"] .mac-main .field textarea { background: #1e1e20; color: #f5f5f7; border-color: #3a3a3c; }
+  .mac-who { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 2px 8px 14px; }
+  .mac-who .pm-avatar { width: 58px; height: 58px; border-radius: 18px; font-size: 26px; margin: 0; }
+  .mac-who strong { font-size: 13px; font-weight: 650; color: #1d1d1f; }
+  .mac-who small { color: #6e6e73; font-size: 11px; }
+  .mac-main .ask { background: #fff; border-color: #e5e5ea; color: #1d1d1f; border-radius: 10px; }
+  .mac-main .pm-lead { margin: 0; line-height: 1.7; color: #1d1d1f; }
+  html[data-theme="ink"] .mac-who strong { color: #f5f5f7; }
+  html[data-theme="ink"] .mac-who small { color: #98989d; }
+  html[data-theme="ink"] .mac-main .ask { background: #2c2c2e; border-color: #3a3a3c; color: #f5f5f7; }
+  html[data-theme="ink"] .mac-main .pm-lead { color: #f5f5f7; }
+  .side-backdrop { position: fixed; inset: 0; z-index: 25; border: 0; padding: 0; background: rgba(20, 16, 12, 0.42); }
+  @media (max-width: 1100px) {
+    .cards, .tcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 900px) {
+    .sidebar {
+      position: fixed; z-index: 26; top: 0; bottom: 0; left: 0;
+      width: min(300px, 88vw); box-shadow: var(--shadow);
+    }
+    .stage { position: relative; }
+    .panel { position: absolute; inset: 0; width: auto; z-index: 8; }
+    .yt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+    .page-inner, .plaza-wrap, .col, .composer-wrap { padding-left: 16px; padding-right: 16px; }
+    .home-stage { padding: 24px 16px 12px; }
+    .home-hero .greet { margin-bottom: 18px; }
+    .home-composer { margin-top: 16px; }
+    .notice { left: 12px; right: 12px; width: auto; }
+    .filters, .tabs { flex-wrap: nowrap; overflow-x: auto; }
+    .filters button, .tabs button { flex: none; }
+  }
+  @media (max-width: 640px) {
+    .cards, .tcards, .tiers, .choices, .suggests, .yt-grid { grid-template-columns: 1fr; }
+    .home-hero h2, .empty h2 { font-size: 28px; }
+    .piece h3 { font-size: 22px; }
+    .col { padding-top: 18px; }
+    .topbar { padding-left: 8px; padding-right: 8px; gap: 4px; }
+    .stat { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .stat b { font-size: 28px; }
+    .partner-modal, .modal { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
+    .modal { overflow: auto; }
+    .pm-foot { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    @media (max-width: 380px) { .pm-foot { flex-direction: column; } }
+    .side-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+    .composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    .yt-bar { padding-left: 12px; padding-right: 10px; }
+    input, textarea, select { font-size: 16px; }
+    table { display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<div id="toast" role="status"></div>
+<script>
+const AGENTS = {
+  wukong: { id:"wukong", name:"悟空", role:"日常问答、文案和推理", source:"云智能体", cat:"工作", price:"免费", owned:true, greet:"有什么需要帮忙？", uses:"—", about:"默认和悟空说话。写作、整理、纪要都在这次对话里完成。出图和出片会交给创作小助手，并先确认龙豆。" },
+  creator: { id:"creator", name:"创作小助手", role:"图片、修图、成片和混剪", source:"企业智能体", cat:"工具", price:"免费", owned:true, uses:"86.40万", greet:"把素材交给我，直接出图或出片。", about:"给内容创作者和传媒公司用的图文视频工具。图片、修图、成片、混剪都留在这次对话里，生成前看清龙豆。", domains:["图片创作","AI 修图","一键成片","智能混剪"] },
+  knowledge: { id:"knowledge", name:"企业知识库", role:"查制度、方案和内部资料", source:"无穹科技", cat:"工具", price:"免费", owned:true, uses:"138.20万", greet:"想查哪份资料？", about:"只按资料里的原话回答，并标出材料。资料里没有的条款，不另编。", domains:["制度查询","方案检索","口径核对"] },
+  service: { id:"service", name:"客服", role:"接待咨询并整理工单", source:"无穹科技", cat:"工作", price:"免费", owned:true, uses:"73.44万", greet:"把客户原话发我，我来起草回复。", about:"根据客户原话起草回复，并把一周的问题按类型归成工单摘要。", domains:["咨询回复","工单整理","问题归类"] },
+  study: { id:"study", name:"在线学习", role:"按目标拆学习计划", source:"无穹科技", cat:"学习", price:"免费", owned:true, uses:"96.52万", greet:"想学什么，期限是多久？", about:"确认内容和期限后，拆成几个阶段，每阶段写清要掌握的点和练习。", domains:["学习计划","阶段拆分","入门路径"] },
+  english: { id:"english", name:"英语外教", role:"口语情景和纠错", source:"专家库", cat:"学习", price:"免费", owned:true, uses:"210.18万", greet:"今天想练哪一段对话？", about:"按场景陪练一轮对话，指出不自然的句子，并给出可以直接跟读的说法。", domains:["情景口语","纠错","跟读"] },
+  private: { id:"private", name:"私域内容", role:"给个体商家写内容和活动", source:"专家库", cat:"工作", price:"10万龙豆/月卡", cost:100000, owned:false, uses:"42.16万", greet:"订阅后，我按你的门店来写内容和活动。", about:"按门店、客群和活动目标写朋友圈、社群和海报上能直接用的句子。", domains:["门店文案","活动策划","社群话术"] },
+  bid: { id:"bid", name:"招投标消息", role:"按行业、地区和预算盯消息", source:"专家库", cat:"工作", price:"5万龙豆/月卡", cost:50000, owned:false, uses:"18.73万", greet:"告诉我行业、地区和预算，我来盯消息。", about:"按条件整理新发布的消息，并标出截止时间和预算范围。", domains:["行业筛选","地区盯盘","预算提醒"] },
+  property: { id:"property", name:"生活事务", role:"记录家庭和社区事务", source:"专家库", cat:"生活", price:"免费", owned:true, uses:"15.28万", greet:"水电、报修、家庭日程，丢给我就行。", about:"把报修、缴费和家庭日程记下来，需要时按时间找回来。", domains:["报修记录","家庭日程","开支整理"] },
+  game: { id:"game", name:"游戏资讯", role:"汇总今天值得看的游戏消息", source:"专家库", cat:"生活", price:"免费", owned:true, uses:"120.36万", greet:"想看哪类游戏的今日消息？", about:"按类型整理今日新游、更新和活动，只保留你点名的类型。", domains:["今日新游","版本更新","活动资讯"] },
+  worldcup: { id:"worldcup", name:"世界杯", role:"陪你聊球和赛程", source:"商城", cat:"生活", price:"已下架", owned:false, retired:true, uses:"1990.08万", greet:"这个智能体已下架。", about:"赛程、球队和比赛看点。当前已从商城下架，不能再召唤。", domains:["赛程","球队","比赛看点"] },
+  map: { id:"map", name:"学习地图", role:"把一门学问拆成地图", source:"商城", cat:"学习", price:"免费", owned:true, uses:"24.81万", greet:"想系统学哪一门？", about:"从基础到能独立使用，标出每一段要学的内容和前后顺序。", domains:["知识地图","学习顺序","阶段目标"] },
+  summary: { id:"summary", name:"工作总结", role:"把一周工作收成总结", source:"商城", cat:"工作", price:"免费", owned:true, uses:"31.66万", greet:"今天是工作日，有什么需要收成总结？", about:"整理成三段：完成了什么、还差什么、下周先做哪件。", domains:["周报","工作复盘","下周安排"] },
+  doc: { id:"doc", name:"文档处理", role:"改写、提炼和排版文档", source:"专家库", cat:"工作", price:"免费", owned:true, uses:"54.07万", greet:"把文档要点发我，或告诉我要改成什么样。", about:"按要点改短、改语气或整理成条目，不另加材料里没有的结论。", domains:["改写","提炼","排版"] },
+  plan: { id:"plan", name:"学习规划", role:"按考试目标和每天可用时间排计划", source:"专家库", cat:"学习", price:"10万龙豆/月卡", cost:100000, owned:false, uses:"27.05万", greet:"告诉我考试目标、剩余时间和每天能学多久。", about:"先确认考试、剩余天数和每天可用时间，再拆成每周任务。", domains:["考试规划","每日安排","复习重点"] },
+  fitness: { id:"fitness", name:"健身训练", role:"按目标安排训练", source:"专家库", cat:"生活", price:"免费", owned:true, uses:"63.90万", greet:"这周想练力量还是有氧？", about:"按居家能完成的动作排一周训练，写清每组次数和休息。", domains:["力量训练","有氧安排","居家动作"] }
+};
+const ORDER = ["creator","knowledge","service","study","english","private","bid","property","game","worldcup","map","summary","doc","plan","fitness"];
+const SKILLS = {
+  wukong: [
+    { id:"copy", name:"文案写作", hint:"帮我写一段介绍南京的旅行文案" },
+    { id:"notes", name:"资料整理", hint:"把下面要点整理成一页说明" },
+    { id:"meeting", name:"会议纪要", hint:"把这次会议整理成决定和待办" }
+  ],
+  creator: [
+    { id:"image", name:"图片创作", tab:"image" },
+    { id:"retouch", name:"AI 修图", tab:"retouch" },
+    { id:"film", name:"一键成片", tab:"film" },
+    { id:"mix", name:"智能混剪", tab:"mix" }
+  ]
+};
+const TEMPLATES = [
+  { id:"poster", name:"海报设计", note:"城墙、夜景、活动主视觉" },
+  { id:"fashion", name:"服饰鞋帽", note:"随拍和商品封面" },
+  { id:"home", name:"家居建材", note:"空间和材质" },
+  { id:"food", name:"餐饮美食", note:"热气和桌面" }
+];
+const MIX_STYLES = ["电商醒目","全屏沉浸","杂志分栏","上下叙事","商品橱窗","极简留白"];
+const VOICES = ["甜甜","林欣宜","知芝","晨煦","清欢","博文"];
+const TIERS = [
+  { id:"subing", name:"素饼", beans:10000, price:1, note:"目前暂无优惠" },
+  { id:"sumian", name:"素面", beans:55000, price:5, note:"赠送比例 10%" },
+  { id:"xianguo", name:"仙果", beans:120000, price:10, note:"赠送比例 20%" },
+  { id:"pantao", name:"蟠桃", beans:400000, price:30, note:"赠送比例 33%" },
+  { id:"shenguo", name:"参果", beans:700000, price:50, note:"赠送比例 40%" },
+  { id:"jindan", name:"金丹", beans:1500000, price:100, note:"赠送比例 50%" }
+];
+const PAGES = {
+  intro: { title:"公司介绍", body:"诚迈科技股份有限公司做智能终端和行业软件。悟空是其中的 AI 助手，把专业能力收成一个个智能体，放进同一个对话里。\n\n这页是入口示例。正式介绍以公司发布的文案为准。" },
+  solution: { title:"产品方案", body:"默认和悟空说话。专家、技能和企业应用从左侧进入，不另占一条底栏。\n\n创作留在创作小助手的对话里：图片、修图、成片、混剪是这次要做的事，参数在右侧创作台里确认。" },
+  news: { title:"新闻资讯", body:"今天 · 悟空网页版改为对话优先，专业能力从左侧工作伙伴进入。\n昨天 · 创作能力收进创作小助手，生成前先确认龙豆。" },
+  shop: { title:"电商店铺", body:"示例商品，不产生真实订单。\n\n悟空手办 · 展示\n智能体贴纸 · 展示" },
+  lottery: { title:"抽奖", body:"本期奖品是 5,000 龙豆。点参加就记一笔。这是原型示例，不会真的发奖。" }
+};
+
+const state = {
+  workspace: "personal",
+  view: "chat",
+  threadId: "t-nanjing",
+  q: "",
+  cat: "全部",
+  draft: "",
+  panel: null,
+  studioTab: "image",
+  template: "poster",
+  ratio: "9:16",
+  count: 1,
+  clarity: "2K",
+  duration: 10,
+  mixStyle: "杂志分栏",
+  voice: "甜甜",
+  analyzed: false,
+  product: "南京城市礼物",
+  points: "城墙与秦淮河",
+  refs: 0,
+  modal: null,
+  noticeOpen: false,
+  wsMenu: false,
+  accountTab: "home",
+  plazaFilter: "全部",
+  workTab: "公开",
+  beans: 70000,
+  vip: false,
+  joined: false,
+  theme: "paper",
+  memoryOn: true,
+  callMe: "主人",
+  perms: { kb: true, cs: true, ex: false },
+  focus: null,
+  records: [
+    { title:"悟空送宝", amount:20000, time:"今天 09:48" },
+    { title:"注册赠送", amount:50000, time:"昨天 19:02" }
+  ],
+  orders: [
+    { title:"注册赠送 · 50000龙豆", status:"已到账", time:"昨天 19:02", no:"BDREG50000" }
+  ],
+  accountQuery: "",
+  tasks: [
+    { id:"task-1", title:"南京夫子庙夜景口播", kind:"一键成片", status:"生成中", progress:62, time:"刚刚", tone:"#1d4e63", media:"视频", dur:"00:15" },
+    { id:"task-2", title:"明朝婚服", kind:"AI 修图", status:"已完成", progress:100, time:"昨天", tone:"#5c3a4a", media:"图片" },
+    { id:"task-3", title:"秦淮夜游封面", kind:"图片创作", status:"排队中", progress:8, time:"今天", tone:"#243044", media:"图片" },
+    { id:"task-4", title:"新品礼遇季混剪", kind:"智能混剪", status:"已完成", progress:100, time:"周一", tone:"#6d4c41", media:"视频", dur:"00:32" },
+    { id:"task-5", title:"梧桐影里的晚饭", kind:"一键成片", status:"生成中", progress:41, time:"今天", tone:"#3d4a32", media:"视频", dur:"01:24" },
+    { id:"task-6", title:"城墙灯会主视觉", kind:"图片创作", status:"已完成", progress:100, time:"周二", tone:"#7a3b3b", media:"图片" }
+  ],
+  works: [
+    { id:"w1", title:"秦淮夜游：把灯影收成一条片", kind:"视频", topics:["城市","夜景","旅行"], author:"宏志", likes:128, mine:false, vis:"公开", tone:"#1d4e63", h:228, dur:"03:18" },
+    { id:"w2", title:"新品礼遇季", kind:"图片", topics:["商业"], author:"林夏", likes:46, mine:true, vis:"公开", tone:"#6d4c41", h:168 },
+    { id:"w3", title:"明朝服饰 · 婚服改稿", kind:"图片", topics:["服饰"], author:"梦云端", likes:203, mine:false, vis:"公开", tone:"#5c3a4a", h:248 },
+    { id:"w4", title:"英式司康，热气还在", kind:"图片", topics:["美食"], author:"李瑞", likes:87, mine:false, vis:"公开", tone:"#8a5a32", h:186 },
+    { id:"w5", title:"城市夜景", kind:"视频", topics:["城市","夜景"], author:"林夏", likes:64, mine:true, vis:"私密", tone:"#243044", h:210, dur:"00:48" },
+    { id:"w6", title:"夜宵摊烟火", kind:"视频", topics:["美食","夜景"], author:"阿城", likes:151, mine:false, vis:"公开", tone:"#6a3a22", h:196, dur:"01:06" },
+    { id:"w7", title:"梧桐影里的晚饭", kind:"视频", topics:["美食"], author:"阿城", likes:96, mine:false, vis:"公开", tone:"#3d4a32", h:236, dur:"01:24" },
+    { id:"w8", title:"城墙灯会主视觉", kind:"图片", topics:["城市","夜景"], author:"梦云端", likes:312, mine:false, vis:"公开", tone:"#7a3b3b", h:160 },
+    { id:"w9", title:"老门东粉丝汤", kind:"图片", topics:["美食"], author:"李瑞", likes:74, mine:false, vis:"公开", tone:"#a15a32", h:214 },
+    { id:"w10", title:"中山陵台阶上的风", kind:"视频", topics:["城市","旅行"], author:"宏志", likes:189, mine:false, vis:"公开", tone:"#2f4a44", h:188, dur:"02:11" }
+  ],
+  notices: [
+    { title:"活动通知", time:"12 分钟前", text:"悟空送宝，20000 龙豆已充入你的钱袋。", unread:true },
+    { title:"系统通知", time:"13 分钟前", text:"恭喜注册成功。你的第一个智能体已在工作台待命。", unread:true },
+    { title:"充值通知", time:"昨天", text:"注册赠送 50000 龙豆已到账。", unread:false }
+  ],
+  threads: []
+};
+
+function uid() { return Math.random().toString(36).slice(2, 9); }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function beansText(n) { return Number(n).toLocaleString("zh-CN"); }
+function currentThread() { return state.threads.find(t => t.id === state.threadId) || state.threads[0]; }
+function agentOf(thread) { return AGENTS[(thread && thread.agentId) || "wukong"]; }
+const ASKS = {
+  wukong: ["帮我写一段介绍南京的旅行文案", "把下面要点整理成一页说明", "把这次会议整理成决定和待办"],
+  creator: ["做一张南京城市宣传海报", "把衣服改成明朝婚服", "用这些画面做一条 15 秒成片"],
+  knowledge: ["查一下差旅报销怎么走", "入职需要准备哪些材料", "合同里的交付口径在哪一页"],
+  service: ["客户问发货晚了，帮我回复", "把这周的咨询收成工单摘要", "这条差评怎么回更稳妥"],
+  study: ["想学 Java，期限是一个月", "把这门课拆成四个阶段", "今天只学一小时，先看哪一块"],
+  english: ["练一段咖啡店点单", "这句话怎么说更自然", "给我三句可以直接跟读的"],
+  private: ["帮我写三句新店开业的朋友圈", "这场满减活动怎么预热", "社群里怎么把活动说清楚"],
+  bid: ["盯一下南京的信息化项目", "预算 50 万以内的有哪些", "这周新发布的消息列一份"],
+  property: ["记一下明天的水电报修", "本月家庭开支整理一下", "周末的家庭日程排一排"],
+  game: ["今天有哪些值得看的新游", "只看独立游戏的更新", "这周的活动资讯收成一份"],
+  map: ["系统学 Java 一般分几个阶段", "把一门学问画成学习地图", "我现在在第二阶段，下一周学什么"],
+  summary: ["把这周工作收成三段总结", "还差什么，下周先做哪件", "写成可以直接交的周报"],
+  doc: ["把这段话改短，别加新结论", "整理成可以直接贴进文档的条目", "语气收得轻一点"],
+  plan: ["还有 30 天，每天 2 小时，怎么排", "这周先复习哪一块", "按考试目标拆成每周任务"],
+  fitness: ["这周想练力量，居家能完成", "只练有氧，每天 30 分钟", "写清每组次数和休息"]
+};
+function agentAsks(agent) {
+  if (agent.asks) return agent.asks;
+  if (ASKS[agent.id]) return ASKS[agent.id];
+  const fromDomains = (agent.domains || []).slice(0, 2).map(d => "帮我处理一件「" + d + "」的事");
+  return [agent.greet, ...fromDomains].filter(Boolean).slice(0, 3);
+}
+function agentAbility(agent) { return agent.ability || agent.about; }
+function coverHeight(item) {
+  if (item.h) return item.h;
+  const n = [...String(item.id || "x")].reduce((s, c) => s + c.charCodeAt(0), 0);
+  return item.media === "视频" || item.kind === "视频" ? 168 + (n % 4) * 22 : 148 + (n % 3) * 26;
+}
+function coverSvg(item) {
+  const h = coverHeight(item);
+  const tone = item.tone || "#1d4e63";
+  const n = [...String(item.id || "x")].reduce((s, c) => s + c.charCodeAt(0), 0);
+  const gid = "cg" + String(item.id || "x").replace(/[^a-z0-9]/gi, "");
+  const style = n % 4;
+  const y = p => Math.round(h * p);
+  let scene = "";
+  if (style === 0) {
+    const bars = [0, 1, 2, 3, 4].map(i => {
+      const bh = 36 + ((n * (i + 3)) % 70);
+      return `<rect x="${16 + i * 60}" y="${h - bh - 18}" width="44" height="${bh}" rx="3" fill="rgba(255,255,255,${(0.16 + (i % 3) * 0.08).toFixed(2)})"/>`;
+    }).join("");
+    const lights = [0, 1, 2, 3, 4].map(i => [0, 1, 2].map(r => `<circle cx="${32 + i * 60}" cy="${h - 42 - r * 16}" r="1.7" fill="${(n + i + r) % 3 ? "#ffe7b0" : "rgba(255,255,255,.2)"}"/>`).join("")).join("");
+    scene = `<circle cx="${48 + (n % 70)}" cy="${30 + (n % 18)}" r="15" fill="#fff4d6"/><path d="M0 ${y(0.78)} C 80 ${y(0.62)}, 180 ${y(0.9)}, 320 ${y(0.7)} V ${h} H0 Z" fill="rgba(0,0,0,.28)"/>${bars}${lights}`;
+  } else if (style === 1) {
+    scene = `<rect width="320" height="${h}" fill="#3a2418"/><rect y="${y(0.62)}" width="320" height="${h}" fill="#24160f"/><ellipse cx="168" cy="${y(0.6)}" rx="96" ry="26" fill="#f4e7d6"/><ellipse cx="168" cy="${y(0.55)}" rx="64" ry="16" fill="${tone}"/><circle cx="154" cy="${y(0.52)}" r="18" fill="#f0c27a"/><circle cx="184" cy="${y(0.54)}" r="11" fill="#d9894a"/><path d="M150 ${y(0.4)} q 8 -22 0 -34" stroke="rgba(255,255,255,.7)" fill="none" stroke-width="3" stroke-linecap="round"/><path d="M176 ${y(0.38)} q 10 -18 2 -30" stroke="rgba(255,255,255,.45)" fill="none" stroke-width="3" stroke-linecap="round"/>`;
+  } else if (style === 2) {
+    scene = `<circle cx="250" cy="${y(0.16)}" r="22" fill="rgba(255,244,214,.85)"/><circle cx="160" cy="${y(0.32)}" r="30" fill="#f0c9ae"/><path d="M104 ${h} L146 ${y(0.42)} H176 L220 ${h} Z" fill="#6b2d3c"/><path d="M124 ${y(0.5)} Q160 ${y(0.66)} 198 ${y(0.5)} L210 ${h} H112 Z" fill="#f6efe4"/><path d="M146 ${y(0.42)} Q160 ${y(0.5)} 176 ${y(0.42)}" fill="#8d3b4e"/>`;
+  } else {
+    scene = `<circle cx="246" cy="${y(0.2)}" r="20" fill="rgba(255,244,214,.9)"/><rect x="28" y="${y(0.16)}" width="128" height="${y(0.68)}" rx="10" fill="rgba(255,255,255,.18)"/><rect x="172" y="${y(0.32)}" width="118" height="${y(0.42)}" rx="10" fill="rgba(255,255,255,.3)"/><rect x="46" y="${y(0.28)}" width="92" height="8" rx="4" fill="rgba(255,255,255,.55)"/><rect x="46" y="${y(0.38)}" width="70" height="6" rx="3" fill="rgba(255,255,255,.35)"/>`;
+  }
+  return `<svg class="cover-svg" viewBox="0 0 320 ${h}" width="100%" height="${h}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${tone}"/><stop offset="1" stop-color="#16110e"/></linearGradient></defs><rect width="320" height="${h}" fill="url(#${gid})"/>${scene}</svg>`;
+}
+function blankPersonalChat() {
+  let thread = state.threads.find(t => !t.workspace && t.agentId === "wukong" && t.messages.length === 0);
+  if (!thread) {
+    thread = { id:"t-" + uid(), agentId:"wukong", title:"新对话", preview:"还没有消息", time:"刚刚", group:"今天", pinned:false, messages:[] };
+    state.threads.unshift(thread);
+  }
+  return thread;
+}
+function openAccount(tab) {
+  closeDrawer();
+  state.accountTab = tab || state.accountTab || "home";
+  state.modal = "account";
+  state.noticeOpen = false;
+  state.wsMenu = false;
+  render();
+}
+function openPartner(id) {
+  const agent = AGENTS[id];
+  if (!agent) return;
+  state.partnerId = id;
+  state.modal = "partner";
+  render();
+}
+
+function seed() {
+  state.threads = [
+    { id:"t-pin", agentId:"wukong", title:"新品推广文案", preview:"三句就够：短、好记、能转发。", time:"今天", group:"今天", pinned:true, messages:[
+      { role:"user", kind:"text", text:"给新品写三句推广语" },
+      { role:"ai", kind:"text", text:"三句就够：短、好记、能转发。\n\n1. 把要做的事说给我，剩下的我来。\n2. 一个智能体，一门专业。\n3. 今天的文案，不用再打开第四个应用。" }
+    ]},
+    { id:"t-creator", agentId:"creator", title:"南京城市宣传图", preview:"图片创作 · 待确认生成", time:"今天", group:"今天", pinned:false, messages:[
+      { role:"user", kind:"text", text:"做一张南京城市宣传图" },
+      { role:"ai", kind:"task", skill:"image", title:"做一张南京城市宣传图", meta:"1 张 · 9:16 · 2K", cost:2700, phase:"confirm" }
+    ]},
+    { id:"t-nanjing", agentId:"wukong", title:"南京旅行文案", preview:"南京 · 六朝烟雨，一城故事", time:"昨天", group:"昨天", pinned:false, messages:[
+      { role:"user", kind:"text", text:"帮我写一段介绍南京的旅行文案" },
+      { role:"ai", kind:"article", lead:"来啦，俺老孙给你整一段金陵城的文案。", title:"南京 · 六朝烟雨，一城故事", quote:"江南佳丽地，金陵帝王州。", body:"南京把历史揉进梧桐里。走过明城墙，沿秦淮河看灯影，再去中山陵的台阶上吹一会儿风。先锋书店的地下车库里有人安静翻书，老门东的巷口还热着一碗鸭血粉丝汤。", follows:["再文艺一点","加几个冷门打卡点"] }
+    ]},
+    { id:"t-knowledge", agentId:"knowledge", title:"差旅报销", preview:"市内交通实报实销，单日上限 200 元。", time:"昨天", group:"昨天", pinned:false, messages:[
+      { role:"user", kind:"text", text:"查一下差旅报销怎么走" },
+      { role:"ai", kind:"cite", title:"差旅报销按已有制度回答", body:"市内交通实报实销，单日上限 200 元。住宿：一线城市 550 元/晚，其他城市 400 元/晚。流程是员工提交，直属主管审批，财务复核。超过上限需要部门负责人加签。", note:"材料里没有写可以自行提高标准。", sources:["差旅管理办法 · 第三条","财务审批说明 · 超标加签"] }
+    ]},
+    { id:"t-service", agentId:"service", title:"发货晚了", preview:"先道歉，再给预计送达时间。", time:"昨天", group:"昨天", pinned:false, messages:[
+      { role:"user", kind:"text", text:"客户问发货晚了，帮我回复" },
+      { role:"ai", kind:"text", text:"可以这样回：\n\n抱歉让您久等了。您的订单已交由物流加急处理，预计明天送达。我先帮您登记一条延误记录，有新进度会同步给您。\n\n需要的话，我再收成一条更短的短信。" }
+    ]},
+    { id:"t-java", agentId:"map", title:"Java 四个阶段", preview:"语法、面向对象、集合与并发、工程实践。", time:"7月9日", group:"更早", pinned:false, messages:[
+      { role:"user", kind:"text", text:"系统学 Java 一般分几个阶段" },
+      { role:"ai", kind:"text", text:"一般分四个阶段：语法、面向对象、集合与并发、工程实践。你想从哪一段开始，我就按这一段排一周的练习。" }
+    ]},
+    { id:"t-wuqiong", agentId:"knowledge", title:"无穹科技", preview:"创作、知识和服务放在同一工作区。", time:"今天", group:"今天", pinned:false, workspace:"wuqiong", messages:[
+      { role:"ai", kind:"text", text:"无穹科技的事，直接说就行。创作小助手、企业知识库、客服和在线学习都在这个工作区里。" },
+      { role:"ai", kind:"permission" }
+    ]},
+    { id:"t-chengmai", agentId:"wukong", title:"诚迈科技", preview:"公司介绍、方案、资讯、店铺和抽奖。", time:"今天", group:"今天", pinned:false, workspace:"chengmai", messages:[
+      { role:"ai", kind:"text", text:"想了解诚迈的哪一块？点输入框上方的入口，回答会留在这次对话里。" }
+    ]}
+  ];
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 1800);
+}
+function narrow() { return window.matchMedia("(max-width: 900px)").matches; }
+function closeDrawer() { if (narrow()) state.collapsed = true; }
+function go(hash) {
+  closeDrawer();
+  if (location.hash === hash) render();
+  else location.hash = hash;
+}
+function parse() {
+  const raw = (location.hash || "#/chat/t-nanjing").replace(/^#/, "");
+  const [path, query] = raw.split("?");
+  return { parts: path.split("/").filter(Boolean), params: new URLSearchParams(query || "") };
+}
+function applyRoute() {
+  const { parts, params } = parse();
+  const [a, b] = parts;
+  state.modal = null;
+  state.noticeOpen = false;
+  state.wsMenu = false;
+  state.panel = params.get("panel");
+  if (params.get("tab")) state.studioTab = params.get("tab");
+  if (a === "account") {
+    state.view = "chat";
+    state.accountTab = b || "home";
+    state.modal = "account";
+    const thread = currentThread();
+    history.replaceState(null, "", "#/chat/" + ((thread && thread.id) || "t-nanjing"));
+    render();
+    return;
+  }
+  if (a === "plaza") {
+    state.workspace = "personal";
+    state.panel = null;
+    const thread = blankPersonalChat();
+    state.view = "chat";
+    state.threadId = thread.id;
+    history.replaceState(null, "", "#/chat/" + thread.id);
+    render();
+    return;
+  }
+  if (a === "partner" && b) {
+    state.view = "partners";
+    state.partnerId = b;
+    state.modal = "partner";
+    history.replaceState(null, "", "#/partners");
+    render();
+    return;
+  }
+  if (a === "new") {
+    if (!state.threads.some(t => t.id === "t-draft")) {
+      state.threads.unshift({ id:"t-draft", agentId:"wukong", title:"新对话", preview:"还没有消息", time:"刚刚", group:"今天", pinned:false, messages:[] });
+    }
+    state.view = "chat"; state.threadId = "t-draft"; state.workspace = "personal"; state.panel = null;
+  } else if (a === "chat" && b) { state.view = "chat"; state.threadId = b; state.workspace = (currentThread() && currentThread().workspace) || "personal"; }
+  else if (a === "partners") state.view = "partners";
+  else if (a === "tasks") state.view = "tasks";
+  else if (a === "works") state.view = "works";
+  else { state.view = "chat"; state.threadId = "t-nanjing"; }
+  render();
+}
+
+function visibleThreads() {
+  const q = state.q.trim();
+  return state.threads.filter(t => {
+    const ws = t.workspace || "personal";
+    if (ws !== state.workspace) return false;
+    if (!q) return true;
+    return (t.title + t.preview + agentOf(t).name).includes(q);
+  });
+}
+function newChat() {
+  const agentId = state.workspace === "wuqiong" ? "knowledge" : "wukong";
+  const id = "t-" + uid();
+  state.threads.unshift({
+    id, agentId, title:"新对话", preview:"还没有消息", time:"刚刚", group:"今天", pinned:false,
+    workspace: state.workspace === "personal" ? undefined : state.workspace,
+    messages: []
+  });
+  state.draft = "";
+  state.panel = null;
+  go("#/chat/" + id);
+}
+function openAgent(id) {
+  const agent = AGENTS[id];
+  if (!agent || agent.retired) { toast("这个智能体已下架"); return; }
+  if (!agent.owned) { openPartner(id); return; }
+  let thread = state.threads.find(t => t.agentId === id && (t.workspace || "personal") === state.workspace && t.messages.length);
+  if (!thread) {
+    thread = { id:"t-" + uid(), agentId:id, title:agent.name, preview:agent.greet, time:"刚刚", group:"今天", pinned:false, workspace: state.workspace === "personal" ? undefined : state.workspace, messages:[] };
+    state.threads.unshift(thread);
+  }
+  state.panel = id === "creator" ? "studio" : id === "knowledge" ? null : null;
+  go("#/chat/" + thread.id + (id === "creator" ? "?panel=studio&tab=image" : ""));
+}
+function subscribe(id) {
+  const agent = AGENTS[id];
+  if (!agent || agent.retired) return;
+  if (agent.owned) { openAgent(id); return; }
+  if (!agent.cost) {
+    agent.owned = true;
+    toast("已领取「" + agent.name + "」");
+    state.partnerId = id;
+    state.modal = "partner";
+    render();
+    return;
+  }
+  if (state.beans < agent.cost) { state.modal = "recharge"; toast("龙豆不足，先看看档位"); render(); return; }
+  state.beans -= agent.cost;
+  agent.owned = true;
+  state.records.unshift({ title:"领取 " + agent.name, amount:-agent.cost, time:"刚刚" });
+  toast("已领取「" + agent.name + "」");
+  state.partnerId = id;
+  state.modal = "partner";
+  render();
+}
+function costOfStudio() {
+  if (state.studioTab === "image" || state.studioTab === "retouch") return 2700 * state.count;
+  if (state.studioTab === "film") return 12000 * state.duration;
+  return 60000;
+}
+function studioMeta() {
+  if (state.studioTab === "image") return `${state.count} 张 · ${state.ratio} · ${state.clarity}`;
+  if (state.studioTab === "retouch") return `${state.count} 张 · ${state.clarity}`;
+  if (state.studioTab === "film") return `1 条 · ${state.duration} 秒 · ${state.ratio} · 720P`;
+  return `1 条 · ${state.ratio} · 720P`;
+}
+function skillName() {
+  return { image:"图片创作", retouch:"AI 修图", film:"一键成片", mix:"智能混剪" }[state.studioTab];
+}
+function needsVip() { return state.studioTab === "film" || state.studioTab === "mix"; }
+
+function makeReply(agentId, text) {
+  if ((agentId === "wukong" || agentId === "wuqiong") && /图|视频|修图|混剪|成片|海报/.test(text)) {
+    return { role:"ai", kind:"handoff", text:"出图和出片在创作小助手里完成。过去之后，张数、比例和龙豆会先给你确认。", prompt:text };
+  }
+  if (agentId === "creator") {
+    const tab = /修图|衣服|婚服|汉服/.test(text) ? "retouch" : /混剪|素材/.test(text) ? "mix" : /视频|成片|秒/.test(text) ? "film" : "image";
+    state.studioTab = tab;
+    state.panel = "studio";
+    return { role:"ai", kind:"task", skill:tab, title:text.slice(0, 32), meta:studioMeta(), cost:costOfStudio(), phase:"confirm" };
+  }
+  if (agentId === "knowledge" || /报销|制度|合同|入职|请假/.test(text)) {
+    state.panel = "sources";
+    return { role:"ai", kind:"cite", title:"按资料原文回答", body:"已在企业知识库里找到相关条款。报销、审批和材料位置都以引用为准，没有写到的标准我不会补。", note:"需要哪一条原文，直接点右侧材料。", sources:["差旅管理办法 · 第三条","员工手册 · 请假与入职","产品方案 · 交付与报价口径"] };
+  }
+  if (text.includes("文艺")) return { role:"ai", kind:"article", lead:"好，收得更轻一点。", title:"南京 · 给晚风留一盏灯", quote:"城还在，灯也还在。", body:"秦淮河并不吵，它只是把白天没说完的话，换成灯影。你沿着石栏慢慢走，梧桐的影子比人先到桥上。", follows:["再短一点","换成海报描述"] };
+  if (text.includes("冷门") || text.includes("打卡")) return { role:"ai", kind:"text", text:"三个本地人会拐进去的地方：\n\n1. 颐和路的法国梧桐，适合傍晚散步，不必打卡拍照。\n2. 先锋书店地下车库，带上一本书就够。\n3. 老门东靠里的小巷，鸭血粉丝汤比主街那几家安静。" };
+  if (text.includes("会议") || text.includes("纪要")) return { role:"ai", kind:"text", text:"先按三栏收：决定、待办、还没定的问题。你把会议里的原话贴过来，我按这三栏整理，不另加没说过的结论。" };
+  if (text.includes("Java")) return { role:"ai", kind:"text", text:"系统学 Java 一般分四个阶段：语法、面向对象、集合与并发、工程实践。告诉我你现在在哪一段，我按每天一小时来排。" };
+  if (/南京/.test(text) && /文案|旅行|介绍/.test(text)) return { role:"ai", kind:"article", lead:"来啦，俺老孙给你整一段金陵城的文案。", title:"南京 · 六朝烟雨，一城故事", quote:"江南佳丽地，金陵帝王州。", body:"南京把历史揉进梧桐里。走过明城墙，沿秦淮河看灯影，再去中山陵的台阶上吹一会儿风。", follows:["再文艺一点","加几个冷门打卡点"] };
+  const agent = AGENTS[agentId] || AGENTS.wukong;
+  return { role:"ai", kind:"text", text:`${agent.name}记下了：「${text}」。要改语气、缩短，或换成另一件专业的事，直接说下一条就行。` };
+}
+function send(text) {
+  const value = (text ?? state.draft).trim();
+  if (!value) return;
+  const thread = currentThread();
+  thread.messages.push({ role:"user", kind:"text", text:value });
+  thread.messages.push(makeReply(thread.agentId, value));
+  thread.preview = value.slice(0, 36);
+  if (thread.title === "新对话") thread.title = value.slice(0, 16);
+  state.draft = "";
+  render();
+  const scroller = document.querySelector(".transcript");
+  if (scroller) scroller.scrollTop = scroller.scrollHeight;
+}
+function confirmTask(index) {
+  const thread = currentThread();
+  const msg = thread.messages[index];
+  if (!msg || msg.kind !== "task") return;
+  if ((msg.skill === "film" || msg.skill === "mix") && !state.vip) { state.modal = "vip"; render(); return; }
+  if (state.beans < msg.cost) { state.modal = "recharge"; toast("龙豆不足"); render(); return; }
+  state.beans -= msg.cost;
+  msg.phase = "running";
+  msg.progress = 62;
+  state.records.unshift({ title:msg.title, amount:-msg.cost, time:"刚刚" });
+  state.tasks.unshift({ id:uid(), title:msg.title, kind:skillNameOf(msg.skill), status:"生成中", progress:62, time:"刚刚", tone:"#1d4e63", media: msg.skill === "image" || msg.skill === "retouch" ? "图片" : "视频" });
+  toast("已开始生成，可在任务里查看");
+  render();
+}
+function skillNameOf(id) { return { image:"图片创作", retouch:"AI 修图", film:"一键成片", mix:"智能混剪" }[id] || "创作"; }
+function confirmStudio() {
+  if (needsVip() && !state.vip) { state.modal = "vip"; render(); return; }
+  const thread = currentThread();
+  if (thread.agentId !== "creator") { openAgent("creator"); return; }
+  const title = (document.getElementById("prompt") && document.getElementById("prompt").value.trim()) || TEMPLATES.find(t => t.id === state.template).name;
+  thread.messages.push({ role:"user", kind:"text", text:title });
+  thread.messages.push({ role:"ai", kind:"task", skill:state.studioTab, title, meta:studioMeta(), cost:costOfStudio(), phase:"confirm" });
+  thread.preview = skillName() + " · 待确认";
+  toast("已放进这次对话，确认后才扣龙豆");
+  render();
+}
+function handoff(prompt) {
+  let thread = state.threads.find(t => t.id === "t-creator");
+  state.studioTab = /修图|衣服/.test(prompt) ? "retouch" : /视频|混剪/.test(prompt) ? "film" : "image";
+  thread.messages.push({ role:"user", kind:"text", text:prompt });
+  thread.messages.push({ role:"ai", kind:"task", skill:state.studioTab, title:prompt.slice(0, 32), meta:studioMeta(), cost:costOfStudio(), phase:"confirm" });
+  go("#/chat/t-creator?panel=studio&tab=" + state.studioTab);
+}
+function openEnterprisePage(id) {
+  const page = PAGES[id];
+  const thread = currentThread();
+  thread.messages.push({ role:"user", kind:"text", text:page.title });
+  thread.messages.push({ role:"ai", kind:"page", title:page.title, body:page.body });
+  render();
+}
+function recharge(tier) {
+  state.beans += tier.beans;
+  state.records.unshift({ title:"充值" + tier.name, amount:tier.beans, time:"刚刚" });
+  state.orders.unshift({ title:`${tier.name} · ${beansText(tier.beans)}龙豆`, status:"已到账", time:"刚刚", no:"BD" + Date.now().toString(36).toUpperCase() });
+  state.modal = null;
+  toast("已充入 " + beansText(tier.beans) + " 龙豆");
+  render();
+}
+function openVip() {
+  state.vip = true;
+  state.modal = null;
+  toast("已在原型中开通创作 VIP，没有产生扣款");
+  render();
+}
+
+function icon(name) {
+  const paths = {
+    search: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/>',
+    edit: '<path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>',
+    bell: '<path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 7H3s3 0 3-7"/><path d="M10 18a2 2 0 0 0 4 0"/>',
+    side: '<path d="M4 5h16v14H4z"/><path d="M9 5v14"/>',
+    attach: '<path d="M8 12.5l6.5-6.5a3 3 0 0 1 4.2 4.2l-7.8 7.8a4.5 4.5 0 0 1-6.4-6.4l7.2-7.1"/>',
+    mic: '<rect x="9" y="3" width="6" height="10" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/>',
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+    chevron: '<path d="M9 6l6 6-6 6"/>',
+    down: '<path d="M6 9l6 6 6-6"/>'
+  };
+  return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`;
+}
+
+function renderThreadButton(t) {
+  const a = agentOf(t);
+  const on = state.view === "chat" && t.id === state.threadId ? " on" : "";
+  return `<button class="thread${on}" data-go="#/chat/${t.id}"><span class="dot">${esc(a.name.slice(0,1))}</span><span class="t"><strong>${esc(t.title)}</strong><em>${esc(t.preview)}</em></span></button>`;
+}
+function sidebar() {
+  const groups = ["今天","昨天","更早"];
+  const list = visibleThreads();
+  const pinned = list.filter(t => t.pinned);
+  const wsName = { personal:["个人空间","林夏"], wuqiong:["无穹科技","企业工作区"], chengmai:["诚迈科技","企业工作区"] }[state.workspace];
+  const menu = state.wsMenu ? `<div class="ws-menu" role="menu">
+      <button class="${state.workspace==="personal"?"on":""}" data-go="#/chat/t-nanjing">个人空间</button>
+      <button class="${state.workspace==="wuqiong"?"on":""}" data-go="#/chat/t-wuqiong">无穹科技</button>
+      <button class="${state.workspace==="chengmai"?"on":""}" data-go="#/chat/t-chengmai">诚迈科技</button>
+    </div>` : "";
+  const threadHtml = pinned.length ? `<div class="label">置顶</div>${pinned.map(renderThreadButton).join("")}` : "";
+  const rest = groups.map(g => {
+    const items = list.filter(t => !t.pinned && t.group === g);
+    return items.length ? `<div class="label">${g}</div>${items.map(renderThreadButton).join("")}` : "";
+  }).join("");
+  const threadNow = currentThread();
+  const plazaOn = state.view === "chat" && threadNow && threadNow.messages.length === 0 && !state.panel;
+  const links = [
+    ["#/partners","工作伙伴", location.hash.startsWith("#/partners")],
+    ["plaza","广场", plazaOn],
+    ["#/tasks","任务", location.hash.startsWith("#/tasks")],
+    ["#/works","我的作品", location.hash.startsWith("#/works")]
+  ].map(([href, name, on]) => href === "plaza"
+    ? `<button class="side-link${on?" on":""}" data-act="open-plaza"><span>${name}</span></button>`
+    : `<button class="side-link${on?" on":""}" data-go="${href}"><span>${name}</span></button>`).join("");
+  return `<aside class="sidebar">
+    <div class="side-top">
+      <div class="brand"><span class="mark">悟</span><span><strong>诚迈悟空</strong><small>网页版</small></span></div>
+      <button class="primary" data-act="new">${icon("edit")} 新对话</button>
+      <label class="search">${icon("search")}<input id="q" value="${esc(state.q)}" placeholder="搜索对话" aria-label="搜索对话" /></label>
+      <div class="ws"><button data-act="ws" aria-expanded="${state.wsMenu}"><span class="dot">${esc(wsName[0].slice(0,1))}</span><span><strong>${esc(wsName[0])}</strong><small>${esc(wsName[1])}</small></span></button>${menu}</div>
+    </div>
+    <div class="library"><div class="label">资料库</div>${links}</div>
+    <div class="scroll">${threadHtml}${rest}</div>
+    <div class="side-foot">
+      <span class="avatar">林</span>
+      <span class="who"><strong>林夏</strong><small>${beansText(state.beans)} 龙豆${state.vip ? " · VIP" : ""}</small></span>
+      <button class="textbtn${state.modal==="account"?" on":""}" data-act="account">我的</button>
+    </div>
+  </aside>`;
+}
+
+function messageHtml(m, index) {
+  if (m.role === "user") return `<div class="msg user"><div class="bubble">${esc(m.text)}</div></div>`;
+  const head = `<div class="who-line"><span class="dot">悟</span><span>${esc(agentOf(currentThread()).name)}</span></div>`;
+  let body = "";
+  if (m.kind === "article") {
+    body = `<article class="piece"><p class="lead">${esc(m.lead)}</p><h3>${esc(m.title)}</h3><blockquote>${esc(m.quote)}</blockquote><p>${esc(m.body)}</p></article>`;
+  } else if (m.kind === "task") {
+    const running = m.phase === "running";
+    body = `<div class="task"><div class="kicker">${esc(skillNameOf(m.skill))} · ${running ? "生成中" : "待确认"}</div><h3>${esc(m.title)}</h3><p class="meta">${esc(m.meta)}</p><p class="cost">${running ? "已消耗" : "预计"} ${beansText(m.cost)} 龙豆</p>${running ? `<div class="bar"><i style="width:${m.progress || 62}%"></i></div><div class="row" style="margin-top:8px"><button class="ghost" data-go="#/tasks">查看任务</button></div>` : `<div class="row"><button class="ghost" data-act="studio" data-tab="${esc(m.skill)}">调整参数</button><button class="primary" style="width:auto" data-act="confirm" data-index="${index}">确认生成</button></div>`}</div>`;
+  } else if (m.kind === "cite") {
+    body = `<div class="cite"><div class="kicker">企业知识库 · 带来源</div><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><ul>${m.sources.map(s => `<li><button class="srcbtn" data-act="sources">${esc(s)}</button></li>`).join("")}</ul><p class="meta">${esc(m.note || "")}</p></div>`;
+  } else if (m.kind === "handoff") {
+    body = `<div class="handoff"><div class="kicker">交给创作小助手</div><p>${esc(m.text)}</p><button class="primary" style="width:auto" data-act="handoff" data-prompt="${esc(m.prompt)}">在创作小助手中继续</button></div>`;
+  } else if (m.kind === "page") {
+    body = `<div class="pagecard"><div class="kicker">诚迈科技</div><h3>${esc(m.title)}</h3><p style="white-space:pre-wrap">${esc(m.body)}</p>${m.title === "抽奖" ? `<div class="row" style="margin-top:8px"><button class="primary" style="width:auto" data-act="join">${state.joined ? "已参加" : "参加"}</button></div>` : ""}</div>`;
+  } else if (m.kind === "permission") {
+    body = `<div class="perm"><div class="kicker">无穹科技 · 权限</div><p class="meta">权限就在这条对话里，可以直接开关。</p>
+      ${[["kb","知识库可读"],["cs","客服可回复"],["ex","创作可导出"]].map(([id,name]) => `<div class="perm-row"><span>${name}</span><button class="switch${state.perms[id] ? " on" : ""}" data-act="perm" data-id="${id}" aria-pressed="${state.perms[id]}"><i></i></button></div>`).join("")}
+    </div>`;
+  } else body = `<div class="piece"><p style="white-space:pre-wrap;margin:0">${esc(m.text)}</p></div>`;
+  const follows = (m.follows || []).map(f => `<button data-act="send" data-text="${esc(f)}">${esc(f)}</button>`).join("");
+  const tools = m.kind === "permission" ? "" : `<div class="actions"><button class="textbtn" data-act="copy" data-index="${index}">复制</button><button class="textbtn" data-act="read">朗读</button><button class="textbtn" data-act="share">分享</button></div>`;
+  return `<div class="msg">${head}${body}${tools}${follows ? `<div class="follow">${follows}</div>` : ""}</div>`;
+}
+
+function composerBlock(skills, enterprise) {
+  const chips = skills.map(s => `<button class="${state.studioTab===s.tab && state.panel==="studio" ? "on" : ""}" data-act="skill" data-id="${esc(s.id)}" data-hint="${esc(s.hint || "")}" data-tab="${esc(s.tab || "")}">${esc(s.name)}</button>`).join("");
+  return `<div class="chips">${enterprise}${chips}</div>
+      <form class="composer" data-act="submit">
+        <textarea id="composer" rows="2" placeholder="输入消息，Enter 发送，Shift+Enter 换行">${esc(state.draft)}</textarea>
+        <div class="composer-bar">
+          <button type="button" class="iconbtn" data-act="attach" aria-label="添加附件">${icon("attach")}</button>
+          <button type="button" class="iconbtn" data-act="call" aria-label="语音通话">${icon("mic")}</button>
+          <button type="submit" class="send" id="send">发送</button>
+        </div>
+      </form>
+      <div class="hint">内容由 AI 生成。创作会先确认龙豆，不会在未确认时扣费。</div>`;
+}
+function chatView() {
+  const thread = currentThread();
+  const agent = agentOf(thread);
+  const skills = SKILLS[agent.id] || (agent.domains || []).slice(0, 4).map(name => ({ id:name, name, hint:agent.greet }));
+  const empty = thread.messages.length === 0;
+  const showPlaza = empty && state.panel !== "studio" && state.panel !== "sources";
+  const enterprise = thread.workspace === "chengmai" ? ["intro","solution","news","shop","lottery"].map(id => `<button data-act="page" data-id="${id}">${PAGES[id].title}</button>`).join("") : "";
+  const topbar = `<header class="topbar">
+      <button class="iconbtn" data-act="collapse" aria-label="折叠侧栏">${icon("side")}</button>
+      <span class="dot">${esc(agent.name.slice(0,1))}</span>
+      <div><h1>${esc(thread.title)}</h1><p>${esc(agent.name)} · ${esc(agent.role)}</p></div>
+      <span class="spacer"></span>
+      <button class="iconbtn" data-act="notices" aria-label="通知">${icon("bell")}</button>
+      <button class="ghost" data-act="share">分享</button>
+    </header>`;
+  if (showPlaza) {
+    const suggests = (skills.length ? skills : SKILLS.wukong).map(s => `<button data-act="skill" data-id="${esc(s.id)}" data-hint="${esc(s.hint || s.name)}" data-tab="${esc(s.tab || "")}"><b>${esc(s.name)}</b><small>${esc(s.hint || agent.about)}</small></button>`).join("");
+    return `<section class="main">${topbar}
+      <div class="home-scroll" id="home-scroll">
+        <div class="home-stage">
+          <div class="home-hero">
+            <h2>${esc(agent.greet)}</h2>
+            <p class="greet">${esc(agent.role)} · ${esc(agent.source)}</p>
+            <div class="suggests">${suggests}</div>
+          </div>
+          <div class="home-composer composer-inner">${composerBlock([], enterprise)}</div>
+        </div>
+        ${ytBar()}
+        <div class="plaza-wrap">${plazaFeed()}</div>
+      </div>
+      ${state.noticeOpen ? notices() : ""}
+    </section>`;
+  }
+  const body = empty ? `<div><h2>${esc(agent.greet)}</h2><p class="greet">${esc(agent.role)} · ${esc(agent.source)}</p><div class="suggests">${(skills.length ? skills : SKILLS.wukong).map(s => `<button data-act="skill" data-id="${esc(s.id)}" data-hint="${esc(s.hint || s.name)}" data-tab="${esc(s.tab || "")}"><b>${esc(s.name)}</b><small>${esc(s.hint || agent.about)}</small></button>`).join("")}</div></div>`
+    : thread.messages.map(messageHtml).join("");
+  return `<section class="main">${topbar}
+    <div class="stage">
+      <div class="transcript"><div class="col${empty ? " empty" : ""}">${body}</div></div>
+      ${state.panel === "studio" ? studioPanel() : ""}
+      ${state.panel === "sources" ? sourcePanel() : ""}
+    </div>
+    <div class="composer-wrap"><div class="composer-inner">${composerBlock(skills, enterprise)}</div></div>
+    ${state.noticeOpen ? notices() : ""}
+  </section>`;
+}
+function studioPanel() {
+  const tab = state.studioTab;
+  const tabs = [["image","图片创作"],["retouch","AI 修图"],["film","一键成片"],["mix","智能混剪"]];
+  let fields = "";
+  if (tab === "image" || tab === "film") {
+    fields += `<div class="field"><span>模板</span><div class="choices">${TEMPLATES.map(t => `<button type="button" class="choice${state.template===t.id?" on":""}" data-act="template" data-id="${t.id}"><b>${t.name}</b><i>${t.note}</i></button>`).join("")}</div></div>`;
+  }
+  if (tab === "retouch") fields += `<div class="field"><span>原图</span><div class="upload">上传一张要修改的图片<br><button class="ghost" data-act="upload" style="margin-top:8px">选择图像</button></div></div>`;
+  if (tab === "mix") {
+    fields += `<div class="field"><span>素材 · 最多 8 个</span><div class="upload">${state.refs ? `已添加 ${state.refs} 个素材` : "添加视频或图片"}<br><button class="ghost" data-act="upload" style="margin-top:8px">添加素材</button></div></div>
+      <div class="field"><label for="product">商品名称</label><input id="product" value="${esc(state.product)}" /></div>
+      <div class="field"><label for="points">特色卖点</label><input id="points" value="${esc(state.points)}" /></div>
+      <div class="field"><span>目标人群</span><input placeholder="如：通勤白领、来南京的游客" /></div>
+      ${state.analyzed ? `<div class="field"><span>画面模板</span><div class="choices">${MIX_STYLES.map(n => `<button type="button" class="choice${state.mixStyle===n?" on":""}" data-act="mix" data-id="${esc(n)}"><b>${esc(n)}</b></button>`).join("")}</div></div>
+      <div class="field"><span>配音</span><div class="choices">${VOICES.map(n => `<button type="button" class="choice${state.voice===n?" on":""}" data-act="voice" data-id="${esc(n)}"><b>${esc(n)}</b></button>`).join("")}</div></div>` : `<button class="ghost" data-act="analyze">分析素材</button>`}`;
+  } else {
+    fields += `<div class="field"><label for="prompt">描述</label><textarea id="prompt" rows="4" placeholder="描述风格、场景、主体和氛围">${tab==="image"?"一张大气的南京城市宣传海报，融合城墙与秦淮河":tab==="retouch"?"把衣服改成华丽的明朝婚服，保留人物和构图":"用这些画面做一条城市宣传片，第一张作为开场"}</textarea><button class="textbtn" data-act="polish">AI 润色</button></div>`;
+    if (tab !== "retouch") fields += `<div class="field"><span>参考图 · ${state.refs}/5</span><button class="ghost" data-act="upload">添加参考图片</button></div>`;
+  }
+  if (tab !== "mix") {
+    fields += `<div class="field"><span>${tab==="film"?"比例":"比例"}</span><div class="row">${["1:1","3:4","9:16","16:9"].map(r => `<button class="ghost${state.ratio===r?" soft":""}" data-act="ratio" data-id="${r}">${r}</button>`).join("")}</div></div>`;
+  }
+  if (tab === "image" || tab === "retouch") fields += `<div class="field"><span>数量</span><div class="row">${[1,2,3,4].map(n => `<button class="ghost${state.count===n?" soft":""}" data-act="count" data-id="${n}">${n}</button>`).join("")}</div></div><p class="meta">清晰度 ${state.clarity}</p>`;
+  if (tab === "film") fields += `<div class="field"><span>时长</span><div class="row">${[5,10,15].map(n => `<button class="ghost${state.duration===n?" soft":""}" data-act="duration" data-id="${n}">${n} 秒</button>`).join("")}</div></div>`;
+  const vipNote = needsVip() && !state.vip ? `<p class="meta">一键成片和智能混剪需要创作 VIP。</p>` : "";
+  return `<aside class="panel"><header><strong>创作台</strong><span class="spacer"></span><button class="iconbtn" data-act="close-panel" aria-label="关闭">${icon("close")}</button></header><div class="body"><div class="tabs">${tabs.map(([id,name]) => `<button class="${tab===id?"on":""}" data-act="stab" data-id="${id}">${name}</button>`).join("")}</div>${fields}${vipNote}</div><div class="sticky-cta"><div><div class="meta">预计消耗</div><b>${beansText(costOfStudio())}</b> 龙豆</div><button class="primary" style="width:auto" data-act="studio-confirm">${needsVip() && !state.vip ? "查看 VIP" : "放入对话确认"}</button></div></aside>`;
+}
+function sourcePanel() {
+  return `<aside class="panel"><header><strong>引用资料</strong><span class="spacer"></span><button class="iconbtn" data-act="close-panel" aria-label="关闭">${icon("close")}</button></header><div class="body">
+    <div class="task"><div class="kicker">差旅管理办法.pdf</div><h3>第三条 · 报销标准</h3><p>市内交通实报实销，单日上限 200 元。一线城市住宿 550 元/晚，其他城市 400 元/晚。</p></div>
+    <div class="task" style="margin-top:8px"><div class="kicker">财务审批说明.pdf</div><h3>超标加签</h3><p>员工提交后，由直属主管审批、财务复核。超过上限的部分，需要部门负责人加签。</p></div>
+    <p class="meta">回答只引用这些材料，不把资料里没有的数字说成制度。</p>
+  </div></aside>`;
+}
+function notices() {
+  return `<div class="notice" role="dialog" aria-label="通知">${state.notices.map(n => `<button data-act="read-notice"><strong>${esc(n.title)} · ${esc(n.time)}</strong><span>${esc(n.text)}</span></button>`).join("")}<button data-act="account" data-tab="beans">查看龙豆记录</button></div>`;
+}
+
+function partnersView() {
+  const cats = ["全部","生活","学习","工作","工具"];
+  const items = ORDER.filter(id => state.cat === "全部" || AGENTS[id].cat === state.cat).filter(id => !state.q || (AGENTS[id].name + AGENTS[id].role).includes(state.q));
+  return pageShell("工作伙伴", "先看能力，再领取。点领取打开伙伴详情，确认后再放进对话。", `<div class="filters">${cats.map(c => `<button class="${state.cat===c?"on":""}" data-act="cat" data-id="${c}">${c}</button>`).join("")}</div><div class="cards">${items.map(id => {
+    const a = AGENTS[id];
+    const tag = a.retired ? `<span class="tag muted">已下架</span>` : a.owned ? `<span class="tag">已领取</span>` : `<span class="tag warn">${esc(a.price)}</span>`;
+    const btn = a.retired
+      ? `<button class="primary claim" disabled>已下架</button>`
+      : `<button class="primary claim${a.owned ? " owned" : ""}" data-act="open-partner" data-id="${a.id}">${a.owned ? "已领取" : "领取"}</button>`;
+    return `<article class="card partner-card"><div class="partner-top"><span class="partner-av">${esc(a.name.slice(0,1))}</span>${tag}</div><h3>${esc(a.name)}</h3><p>${esc(a.role)}</p><small>${esc(a.source)} · ${esc(a.uses)} 次使用</small>${btn}</article>`;
+  }).join("")}</div>`);
+}
+function partnerView() {
+  const a = AGENTS[state.partnerId] || AGENTS.creator;
+  const action = a.retired ? `<button class="ghost" disabled>已下架</button>` : a.owned ? `<button class="primary" style="width:auto" data-act="use" data-id="${a.id}">开始对话</button>` : `<button class="primary" style="width:auto" data-act="sub" data-id="${a.id}">${a.cost ? "订阅 · " + a.price : "添加"}</button>`;
+  return pageShell(a.name, a.role, `<div class="detail"><div class="card" style="cursor:default"><span class="tag">${esc(a.source)}</span><p style="margin-top:10px">${esc(a.about)}</p><p class="meta">${esc(a.uses)} 次使用</p><div class="row" style="margin-top:12px">${action}<button class="ghost" data-go="#/partners">返回</button></div></div><div><div class="label">能做的事</div><div class="chips">${(a.domains||[]).map(d => `<button data-act="use" data-id="${a.id}">${esc(d)}</button>`).join("")}</div><p class="meta">召唤之后，它会成为左侧的一条对话，而不是另一个应用。</p></div></div>`);
+}
+const PLAZA_CHIPS = ["全部","视频","图片","美食","城市","夜景","服饰","旅行"];
+function matchesPlaza(w) {
+  if (w.vis !== "公开") return false;
+  const f = state.plazaFilter || "全部";
+  if (f === "全部") return true;
+  if (f === "视频" || f === "图片") return w.kind === f;
+  return (w.topics || []).includes(f);
+}
+function ytBar() {
+  const chips = PLAZA_CHIPS.map(n => `<button type="button" class="yt-chip${state.plazaFilter===n?" on":""}" data-act="plaza" data-id="${n}">${n}</button>`).join("");
+  return `<div class="yt-bar"><div class="yt-bar-scroll">${chips}</div><button type="button" class="yt-bar-next" data-act="chips-next" aria-label="更多分类">${icon("chevron")}</button><button type="button" class="yt-bar-down" data-act="plaza-down" aria-label="向下滚动，查看广场">${icon("down")}</button></div>`;
+}
+function revealPlaza() {
+  const sc = document.getElementById("home-scroll");
+  const bar = document.querySelector(".home-scroll .yt-bar");
+  if (!sc || !bar) return;
+  const top = bar.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
+  sc.scrollTo({ top, behavior: "smooth" });
+}
+function plazaFeed() {
+  return mediaCards(state.works.filter(matchesPlaza));
+}
+function plazaView() {
+  return pageShell("广场", "公开作品。自己的可以继续修图或混剪，别人的可以看、收藏和评论。", ytBar() + mediaCards(state.works.filter(matchesPlaza)));
+}
+function worksView() {
+  const items = state.works.filter(w => state.workTab === "公开" ? w.mine && w.vis === "公开" : state.workTab === "私密" ? w.mine && w.vis === "私密" : w.mine);
+  return pageShell("我的作品", "个人主页对外只展示公开的那一批。", filters(["公开","私密","收藏","喜欢"], state.workTab, "worktab") + (items.length ? mediaCards(items) : `<p class="meta">这个分组里还没有作品。</p>`));
+}
+function mediaCards(items) {
+  const WHEN = ["今天", "昨天", "3 天前", "1 周前", "2 周前", "1 个月前"];
+  return `<div class="yt-grid">${items.map(w => {
+    const video = w.kind === "视频" || w.media === "视频";
+    const dur = w.dur || (video ? "00:30" : "");
+    const n = [...String(w.id || "x")].reduce((s, c) => s + c.charCodeAt(0), 0);
+    const when = WHEN[n % WHEN.length];
+    const cover = Object.assign({}, w, { h: 180 });
+    return `<article class="yt-card"><button class="yt-thumb" data-act="open-work" data-id="${w.id}" aria-label="${esc(w.title)}">${coverSvg(cover)}${dur ? `<span class="vbadge">${esc(dur)}</span>` : ""}</button><div class="yt-meta"><span class="yt-av">${esc((w.author || "悟").slice(0, 1))}</span><div class="yt-copy"><h3 class="yt-title">${esc(w.title)}</h3><div class="yt-sub">${esc(w.author || "")}</div><div class="yt-sub">${w.likes || 0} 次观看 · ${when}</div></div></div></article>`;
+  }).join("")}</div>`;
+}
+function filters(list, current, act) {
+  return `<div class="filters">${list.map(n => `<button class="${current===n?"on":""}" data-act="${act}" data-id="${n}">${n}</button>`).join("")}</div>`;
+}
+function taskCards() {
+  return `<div class="tcards">${state.tasks.map(t => {
+    const cover = { id:t.id, tone:t.tone, h:168, kind:t.media || "图片", title:t.title };
+    const tagClass = t.status === "已完成" ? "tag" : t.status === "排队中" ? "tag muted" : "tag warn";
+    return `<article class="tcard"><div class="tthumb">${coverSvg(cover)}<span class="vbadge">${esc(t.media || t.kind)}</span></div><div class="pad"><h3>${esc(t.title)}</h3><div class="tmeta"><span class="${tagClass}">${esc(t.status)}</span><small>${esc(t.kind)} · ${esc(t.time)}</small></div><div class="bar"><i style="width:${t.progress}%"></i></div><div class="tprog"><span>进度 ${t.progress}%</span><span>${t.progress >= 100 ? "可以打开作品" : "生成过程中可离开"}</span></div></div></article>`;
+  }).join("")}</div>`;
+}
+function tasksView() {
+  return pageShell("任务", "每条任务都有封面、标题、进度和状态。生成中的可以离开对话，回来再看。", taskCards());
+}
+const ACCOUNT_TABS = [
+  ["home","账户","#0a84ff","人"],
+  ["beans","龙豆","#ff9f0a","豆"],
+  ["vip","会员","#bf5af2","V"],
+  ["memory","记忆","#30d158","记"],
+  ["settings","设置","#8e8e93","设"],
+  ["help","帮助","#ffd60a","?"]
+];
+function accountPane() {
+  const tab = state.accountTab;
+  if (tab === "home") return `<div class="stat"><div><div class="meta">林夏 · 个人空间</div><b>${beansText(state.beans)}</b><div>龙豆${state.vip ? " · 创作 VIP" : " · 普通会员"}</div></div><div class="row"><button class="ghost" data-act="account-tab" data-id="beans">购买龙豆</button><button class="primary" style="width:auto" data-act="account-tab" data-id="vip">${state.vip ? "查看权益" : "开通 VIP"}</button></div></div><div class="list-row"><span>邀请好友</span><button class="ghost" data-act="invite">复制邀请码</button></div><div class="list-row"><span>问题反馈</span><button class="ghost" data-act="feedback">写一条反馈</button></div><div class="list-row"><span>关于</span><span class="meta">诚迈悟空网页版原型</span></div>`;
+  if (tab === "beans") return `<div class="stat"><div><div class="meta">当前余额</div><b>${beansText(state.beans)}</b></div></div><div class="tiers">${TIERS.map(t => `<button class="card" data-act="tier" data-id="${t.id}"><span class="tag">${t.price} 元</span><h3>${t.name}</h3><p>${beansText(t.beans)} 龙豆</p><small>${esc(t.note)}</small></button>`).join("")}</div><h3 style="margin-top:18px">最近记录</h3><table><tr><th>项目</th><th>龙豆</th><th>时间</th></tr>${state.records.map(r => `<tr><td>${esc(r.title)}</td><td>${r.amount>0?"+":""}${beansText(r.amount)}</td><td>${esc(r.time)}</td></tr>`).join("")}</table><h3>订单</h3><table><tr><th>订单</th><th>状态</th><th>单号</th></tr>${state.orders.map(o => `<tr><td>${esc(o.title)}</td><td>${esc(o.status)}</td><td>${esc(o.no)}</td></tr>`).join("")}</table><p class="meta">充值只可选择以上固定档位。原型里的到账不会产生真实支付。</p>`;
+  if (tab === "vip") return `<table><tr><th>权益</th><th>普通会员</th><th>VIP</th></tr><tr><td>图片创作 / AI 修图</td><td>按龙豆</td><td>按龙豆</td></tr><tr><td>一键成片 / 智能混剪</td><td>不可用</td><td>可用</td></tr><tr><td>生成速度</td><td>排队</td><td>优先队列</td></tr><tr><td>单次张数</td><td>1 张</td><td>最多 5 张</td></tr><tr><td>下载水印</td><td>带水印</td><td>无水印</td></tr></table><div class="row" style="margin-top:14px"><button class="primary" style="width:auto" data-act="vip">${state.vip ? "已开通" : "在原型中开通"}</button><span class="meta">不会跳转支付，也不会扣款。</span></div>`;
+  if (tab === "memory") return `<div class="perm-row"><span>使用记忆</span><button class="switch${state.memoryOn?" on":""}" data-act="memory" aria-pressed="${state.memoryOn}"><i></i></button></div><div class="field" style="margin-top:12px"><label>对我的称呼</label><input id="callme" value="${esc(state.callMe)}" /></div><button class="ghost" data-act="save-call">保存称呼</button><div class="task" style="margin-top:12px"><div class="kicker">已记住</div><p>文案语气可以收得轻一点。创作默认 9:16。回答不另加材料里没有的结论。</p></div>`;
+  if (tab === "settings") return `<div class="label">主题皮肤</div><div class="row"><button class="ghost${state.theme==="paper"?" soft":""}" data-act="theme" data-id="paper">纸本${state.theme==="paper"?" · 使用中":""}</button><button class="ghost${state.theme==="ink"?" soft":""}" data-act="theme" data-id="ink">墨色${state.theme==="ink"?" · 使用中":""}</button></div><div class="list-row"><span>退出</span><button class="ghost" data-act="logout">退出登录</button></div>`;
+  return `<div class="task"><h3>如何生成第一张图片？</h3><p>在创作小助手的对话里打开右侧创作台，选模板、写描述、看清龙豆，再放进对话确认。</p></div><div class="task" style="margin-top:8px"><h3>任务和作品在哪里？</h3><p>新对话的输入框下面就是广场。任务和我的作品仍在左侧资料库。生成过程中可以离开对话，进度留在任务里。</p></div><div class="task" style="margin-top:8px"><h3>关闭创作台会丢掉内容吗？</h3><p>不会自动生成。还没确认的参数留在右侧，确认之后才会扣龙豆。</p></div>`;
+}
+function mobileAccount() {
+  const current = ACCOUNT_TABS.find(t => t[0] === state.accountTab) || ACCOUNT_TABS[0];
+  return `<div class="mine-sheet" role="dialog" aria-label="我的"><header class="topbar"><button class="iconbtn" data-act="close-modal" aria-label="关闭">${icon("close")}</button><div><h1>我的</h1><p>${esc(current[1])}</p></div></header><div class="page"><div class="page-inner"><div class="filters">${ACCOUNT_TABS.map(([id, name]) => `<button class="${state.accountTab===id?"on":""}" data-act="account-tab" data-id="${id}">${name}</button>`).join("")}</div>${accountPane()}</div></div></div>`;
+}
+function macSettingsModal() {
+  const q = (state.accountQuery || "").trim();
+  const tabs = ACCOUNT_TABS.filter(t => !q || t[1].includes(q) || t[0].includes(q));
+  const current = ACCOUNT_TABS.find(t => t[0] === state.accountTab) || ACCOUNT_TABS[0];
+  if (!tabs.some(t => t[0] === state.accountTab) && tabs[0]) state.accountTab = tabs[0][0];
+  const shown = ACCOUNT_TABS.find(t => t[0] === state.accountTab) || current;
+  return `<div class="modal-back mac-back"><div class="mac-window" role="dialog" aria-label="我的"><aside class="mac-side"><div class="traffic"><button type="button" class="tl close" data-act="close-modal" aria-label="关闭"></button><span class="tl min" aria-hidden="true"></span><span class="tl max" aria-hidden="true"></span></div><label class="mac-search">${icon("search")}<input id="account-q" value="${esc(state.accountQuery || "")}" placeholder="搜索" aria-label="搜索设置" /></label><nav class="mac-nav">${tabs.map(([id,name,color,glyph]) => `<button type="button" class="${state.accountTab===id?"on":""}" data-act="account-tab" data-id="${id}"><span class="mac-ico" style="background:${color};color:${id==="help"?"#3a2a12":"#fff"}">${glyph}</span><span>${name}</span></button>`).join("") || `<p class="meta" style="padding:8px 10px">没有匹配的设置</p>`}</nav></aside><div class="mac-main"><h2>${esc(shown[1])}</h2><div class="mac-group">${accountPane()}</div></div></div></div>`;
+}
+function partnerModal() {
+  const a = AGENTS[state.partnerId] || AGENTS.creator;
+  const asks = agentAsks(a);
+  const domains = a.domains || [a.role];
+  const action = a.retired
+    ? `<button class="ghost" disabled>已下架</button>`
+    : a.owned
+      ? `<button class="primary" data-act="use" data-id="${a.id}">召唤工作伙伴</button>`
+      : `<button class="primary" data-act="sub" data-id="${a.id}">${a.cost ? "领取 · " + esc(a.price) : "领取"}</button>`;
+  return `<div class="modal-back"><div class="modal partner-modal" role="dialog" aria-label="工作伙伴详情"><div class="pm-head"><strong>工作伙伴详情</strong><span class="spacer"></span><button class="iconbtn" data-act="close-modal" aria-label="关闭">${icon("close")}</button></div><div class="pm-body"><div class="pm-hero"><div class="pm-avatar">${esc(a.name.slice(0,1))}</div><h3>${esc(a.name)}</h3><p class="meta">${esc(a.uses)} 次使用 · ${esc(a.source)} · ${esc(a.price)}</p></div><p style="margin:16px 0 0;line-height:1.75">${esc(a.about)}</p><section class="pm-sec"><h4><i></i>擅长领域</h4><div class="chips">${domains.map(d => `<span class="tag">${esc(d)}</span>`).join("")}</div></section><section class="pm-sec"><h4><i></i>试试这样问我</h4>${asks.map(q => `<button class="ask" data-act="ask-agent" data-id="${a.id}" data-text="${esc(q)}"><span>“${esc(q)}”</span><span aria-hidden="true">›</span></button>`).join("")}</section><section class="pm-sec"><h4><i></i>能力介绍</h4><p style="margin:0;line-height:1.75;white-space:pre-wrap">${esc(agentAbility(a))}</p></section></div><div class="pm-foot"><button class="ghost" data-act="share-partner">分享</button>${action}</div></div></div>`;
+}
+function pageShell(title, sub, inner) {
+  const hash = location.hash;
+  return `<section class="main"><header class="topbar"><button class="iconbtn" data-act="collapse" aria-label="折叠侧栏">${icon("side")}</button><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></header><div class="page"><div class="page-inner">${inner}</div></div></section>`;
+}
+function modalHtml() {
+  if (state.modal === "account") return narrow() ? mobileAccount() : macSettingsModal();
+  if (state.modal === "partner") return partnerModal();
+  if (state.modal === "recharge") return `<div class="modal-back"><div class="modal" role="dialog" aria-label="购买龙豆"><h3>龙豆不足</h3><p class="meta">余额 ${beansText(state.beans)}。选择档位后只在这个原型里到账。</p><div class="tiers">${TIERS.slice(0,3).map(t => `<button class="card" data-act="tier" data-id="${t.id}"><b>${t.name}</b><i>${beansText(t.beans)} 龙豆 · ${t.price} 元</i></button>`).join("")}</div><div class="row" style="margin-top:12px"><button class="ghost" data-act="close-modal">取消</button><button class="textbtn" data-act="account" data-tab="beans">全部档位</button></div></div></div>`;
+  if (state.modal === "vip") return `<div class="modal-back"><div class="modal" role="dialog"><h3>创作 VIP</h3><p>一键成片按每秒 12,000 龙豆，智能混剪每条 60,000 龙豆。普通会员不能使用这两项。</p><div class="row"><button class="ghost" data-act="close-modal">先不开通</button><button class="primary" style="width:auto" data-act="vip">在原型中开通</button></div></div></div>`;
+  if (state.modal === "share") return `<div class="modal-back"><div class="modal" role="dialog"><h3>分享这则对话</h3><div class="row"><button class="ghost" data-act="toast" data-text="链接已复制">复制链接</button><button class="ghost" data-act="toast" data-text="已分享给微信好友">微信好友</button><button class="ghost" data-act="toast" data-text="已分享到朋友圈">朋友圈</button><button class="ghost" data-act="toast" data-text="长图已生成">分享长图</button></div><div class="row" style="margin-top:12px"><button class="textbtn" data-act="close-modal">关闭</button></div></div></div>`;
+  if (state.modal === "call") return `<div class="modal-back"><div class="modal call" role="dialog" aria-label="语音通话"><div class="pulse">悟</div><h3>正在听</h3><p class="meta">可以打断，也可以打字补充。说完后会转成文字，留在这次通话里。</p><p>「帮我把刚才的南京文案再收短一点。」</p><div class="row" style="justify-content:center"><button class="ghost" data-act="toast" data-text="已静音">静音</button><button class="ghost" data-act="toast" data-text="已打断回答">打断</button><button class="primary" style="width:auto" data-act="close-modal">结束通话</button></div><p class="meta">示意界面，不会真正录音。</p></div></div>`;
+  if (state.modal === "work") {
+    const w = state.works.find(x => x.id === state.workId) || state.works[0];
+    return `<div class="modal-back"><div class="modal" role="dialog" aria-label="${esc(w.title)}"><div style="border-radius:12px;overflow:hidden">${coverSvg(w)}</div><h3 style="margin-top:12px">${esc(w.title)}</h3><p class="meta">${esc(w.author)} · ${esc(w.kind)} · ${w.likes} 赞</p><div class="row">${w.mine && w.kind==="图片" ? `<button class="ghost" data-act="edit-work">修图</button>` : ""}${w.mine && w.kind==="视频" ? `<button class="ghost" data-act="mix-work">混剪</button>` : `<button class="ghost" data-act="toast" data-text="已收藏">收藏</button>`}<button class="ghost" data-act="toast" data-text="已开始下载">下载</button><button class="textbtn" data-act="close-modal">关闭</button></div></div></div>`;
+  }
+  if (state.modal === "feedback") return `<div class="modal-back"><div class="modal" role="dialog"><h3>问题反馈</h3><div class="filters">${["功能异常","体验问题","产品建议","其他"].map(n => `<button data-act="toast" data-text="已选择${n}">${n}</button>`).join("")}</div><textarea id="fb" rows="4" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--bg)" placeholder="描述你遇到的问题"></textarea><div class="row" style="margin-top:10px"><button class="ghost" data-act="close-modal">取消</button><button class="primary" style="width:auto" data-act="toast" data-text="反馈已提交">提交</button></div></div></div>`;
+  return "";
+}
+
+function render() {
+  document.documentElement.dataset.theme = state.theme === "ink" ? "ink" : "paper";
+  const main = state.view === "partners" ? partnersView()
+    : state.view === "tasks" ? tasksView()
+    : state.view === "works" ? worksView()
+    : state.view === "plaza" ? plazaView()
+    : chatView();
+  const collapsed = state.collapsed ? "style=\"display:none\"" : "";
+  const veil = !state.collapsed && narrow() ? `<button class="side-backdrop" data-act="collapse" aria-label="关闭菜单"></button>` : "";
+  document.getElementById("app").innerHTML = veil + (state.collapsed ? "" : sidebar()) + main + modalHtml();
+  const q = document.getElementById("q");
+  if (q && state.focus === "q") { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+  const composer = document.getElementById("composer");
+  if (composer && state.focus === "composer") composer.focus();
+  const aq = document.getElementById("account-q");
+  if (aq && state.focus === "account-q") { aq.focus(); aq.setSelectionRange(aq.value.length, aq.value.length); }
+}
+
+function textOfMessage(m) {
+  if (!m) return "";
+  return [m.text, m.lead, m.title, m.quote, m.body, m.note].filter(Boolean).join("\n");
+}
+function onAct(act, el) {
+  const id = el.dataset.id;
+  if (act === "new") return newChat();
+  if (act === "open-plaza") {
+    state.workspace = "personal";
+    state.panel = null;
+    return go("#/chat/" + blankPersonalChat().id);
+  }
+  if (act === "account") return openAccount(el.dataset.tab || "home");
+  if (act === "account-tab") { state.accountTab = id || "home"; state.modal = "account"; return render(); }
+  if (act === "open-partner") return openPartner(id);
+  if (act === "share-partner") return toast("链接已复制");
+  if (act === "ask-agent") {
+    const agent = AGENTS[id];
+    if (!agent || agent.retired) return toast("这个智能体已下架");
+    if (!agent.owned) {
+      if (agent.cost) return toast("先在详情里领取这个工作伙伴");
+      agent.owned = true;
+      toast("已领取「" + agent.name + "」");
+    }
+    state.draft = el.dataset.text || "";
+    state.modal = null;
+    state.focus = "composer";
+    return openAgent(id);
+  }
+  if (act === "ws") { state.wsMenu = !state.wsMenu; return render(); }
+  if (act === "collapse") { state.collapsed = !state.collapsed; return render(); }
+  if (act === "notices") { state.noticeOpen = !state.noticeOpen; return render(); }
+  if (act === "read-notice") { toast("已读"); state.noticeOpen = false; return render(); }
+  if (act === "share") { state.modal = "share"; return render(); }
+  if (act === "call") { state.modal = "call"; return render(); }
+  if (act === "attach") return toast("可添加照片、视频或文件。原型不会上传到服务器。");
+  if (act === "close-modal") { state.modal = null; return render(); }
+  if (act === "close-panel") { state.panel = null; history.replaceState(null, "", location.pathname + location.hash.split("?")[0]); return render(); }
+  if (act === "send") return send(el.dataset.text);
+  if (act === "skill") {
+    if (el.dataset.tab) { state.studioTab = el.dataset.tab; state.panel = "studio"; render(); return; }
+    if (el.dataset.hint) state.draft = el.dataset.hint;
+    state.focus = "composer";
+    return render();
+  }
+  if (act === "studio") { state.studioTab = el.dataset.tab || "image"; state.panel = "studio"; return render(); }
+  if (act === "stab") { state.studioTab = id; return render(); }
+  if (act === "template") { state.template = id; return render(); }
+  if (act === "ratio") { state.ratio = id; return render(); }
+  if (act === "count") { state.count = Number(id); return render(); }
+  if (act === "duration") { state.duration = Number(id); return render(); }
+  if (act === "mix") { state.mixStyle = id; return render(); }
+  if (act === "voice") { state.voice = id; return render(); }
+  if (act === "upload") { state.refs = Math.min(5, state.refs + 1); toast("已添加素材"); return render(); }
+  if (act === "polish") { toast("已润色描述"); const p = document.getElementById("prompt"); if (p) p.value = "画面干净，光线自然，适合直接使用。" + p.value; return; }
+  if (act === "analyze") { state.analyzed = true; toast("分析完成，请选择成片思路"); return render(); }
+  if (act === "studio-confirm") return confirmStudio();
+  if (act === "confirm") return confirmTask(Number(el.dataset.index));
+  if (act === "sources") { state.panel = "sources"; return render(); }
+  if (act === "handoff") return handoff(el.dataset.prompt || "做一张南京城市宣传图");
+  if (act === "copy") { const m = currentThread().messages[Number(el.dataset.index)]; toast("已复制"); if (navigator.clipboard) navigator.clipboard.writeText(textOfMessage(m)).catch(() => {}); return; }
+  if (act === "read") return toast("这段话暂时不能朗读");
+  if (act === "page") return openEnterprisePage(id);
+  if (act === "perm") { state.perms[el.dataset.id] = !state.perms[el.dataset.id]; return render(); }
+  if (act === "join") { state.joined = true; toast("已参加，这是原型示例"); return render(); }
+  if (act === "cat") { state.cat = id; return render(); }
+  if (act === "sub") return subscribe(id);
+  if (act === "use") return openAgent(id);
+  if (act === "plaza") {
+    const sc = document.getElementById("home-scroll") || document.querySelector(".page");
+    const row = document.querySelector(".yt-bar-scroll");
+    const keep = sc ? sc.scrollTop : 0;
+    const chipLeft = row ? row.scrollLeft : 0;
+    state.plazaFilter = id || "全部";
+    render();
+    const next = document.getElementById("home-scroll") || document.querySelector(".page");
+    if (next) next.scrollTop = keep;
+    const nextRow = document.querySelector(".yt-bar-scroll");
+    if (nextRow) nextRow.scrollLeft = chipLeft;
+    return;
+  }
+  if (act === "plaza-down") { revealPlaza(); return; }
+  if (act === "chips-next") { const row = document.querySelector(".yt-bar-scroll"); if (row) row.scrollBy({ left: 220, behavior: "smooth" }); return; }
+  if (act === "worktab") { state.workTab = id; return render(); }
+  if (act === "open-work") { state.workId = id; state.modal = "work"; return render(); }
+  if (act === "edit-work") { state.modal = null; state.studioTab = "retouch"; go("#/chat/t-creator?panel=studio&tab=retouch"); return; }
+  if (act === "mix-work") { state.modal = null; state.studioTab = "mix"; go("#/chat/t-creator?panel=studio&tab=mix"); return; }
+  if (act === "tier") return recharge(TIERS.find(t => t.id === id));
+  if (act === "vip") { if (!state.vip) return openVip(); return; }
+  if (act === "memory") { state.memoryOn = !state.memoryOn; return render(); }
+  if (act === "save-call") { const v = document.getElementById("callme"); if (v) state.callMe = v.value.trim() || "主人"; toast("称呼已保存"); return; }
+  if (act === "theme") { state.theme = id; return render(); }
+  if (act === "invite") return toast("邀请码已复制");
+  if (act === "feedback") { state.modal = "feedback"; return render(); }
+  if (act === "logout") return toast("原型保持登录，方便继续查看");
+  if (act === "toast") { toast(el.dataset.text || "已完成"); state.modal = null; return render(); }
+}
+
+document.getElementById("app").addEventListener("click", event => {
+  if (event.target.classList && event.target.classList.contains("modal-back")) {
+    state.modal = null;
+    render();
+    return;
+  }
+  const goEl = event.target.closest("[data-go]");
+  if (goEl) { go(goEl.dataset.go); return; }
+  const actEl = event.target.closest("[data-act]");
+  if (!actEl || actEl.dataset.act === "submit") return;
+  onAct(actEl.dataset.act, actEl);
+});
+document.getElementById("app").addEventListener("submit", event => {
+  const form = event.target.closest("form");
+  if (!form) return;
+  event.preventDefault();
+  send();
+});
+document.getElementById("app").addEventListener("input", event => {
+  if (event.target.id === "q") { state.q = event.target.value; state.focus = "q"; render(); }
+  if (event.target.id === "account-q") { state.accountQuery = event.target.value; state.focus = "account-q"; render(); }
+  if (event.target.id === "composer") state.draft = event.target.value;
+  if (event.target.id === "product") state.product = event.target.value;
+  if (event.target.id === "points") state.points = event.target.value;
+});
+document.getElementById("app").addEventListener("keydown", event => {
+  if (event.target.id === "composer" && event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    send();
+  }
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && state.modal) {
+    state.modal = null;
+    render();
+    return;
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    state.focus = "q";
+    if (state.view !== "chat" && state.view !== "partners") go("#/chat/" + (currentThread() ? currentThread().id : "t-nanjing"));
+    else render();
+  }
+});
+window.addEventListener("hashchange", applyRoute);
+seed();
+if (narrow()) state.collapsed = true;
+if (!location.hash) location.hash = "#/chat/t-nanjing";
+else applyRoute();
+</script>
+</body>
+</html>
