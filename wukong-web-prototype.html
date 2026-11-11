@@ -370,8 +370,8 @@
     position: sticky; top: 0; z-index: 5; flex: none;
     display: flex; align-items: center; gap: 8px;
     height: 56px; padding: 0 16px 0 20px;
-    background: var(--bg); border-bottom: 1px solid var(--line);
-    box-shadow: 0 8px 16px rgba(40, 32, 22, 0.05);
+    background: var(--bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    box-shadow: 0 -8px 16px rgba(40, 32, 22, 0.04), 0 8px 16px rgba(40, 32, 22, 0.05);
   }
   .yt-bar-scroll {
     display: flex; gap: 12px; overflow-x: auto; flex: 1; min-width: 0;
@@ -1174,7 +1174,6 @@ function chatView() {
   if (showPlaza) {
     const suggests = (skills.length ? skills : SKILLS.wukong).map(s => `<button data-act="skill" data-id="${esc(s.id)}" data-hint="${esc(s.hint || s.name)}" data-tab="${esc(s.tab || "")}"><b>${esc(s.name)}</b><small>${esc(s.hint || agent.about)}</small></button>`).join("");
     return `<section class="main">${topbar}
-      ${ytBar()}
       <div class="home-scroll" id="home-scroll">
         <div class="home-stage">
           <div class="home-hero">
@@ -1184,6 +1183,7 @@ function chatView() {
           </div>
           <div class="home-composer composer-inner">${composerBlock([], enterprise)}</div>
         </div>
+        ${ytBar()}
         <div class="plaza-wrap">${plazaFeed()}</div>
       </div>
       ${state.noticeOpen ? notices() : ""}
@@ -1270,9 +1270,9 @@ function ytBar() {
 }
 function revealPlaza() {
   const sc = document.getElementById("home-scroll");
-  const plaza = document.querySelector(".plaza-wrap");
-  if (!sc || !plaza) return;
-  const top = plaza.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
+  const bar = document.querySelector(".home-scroll .yt-bar");
+  if (!sc || !bar) return;
+  const top = bar.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
   sc.scrollTo({ top, behavior: "smooth" });
 }
 function plazaFeed() {
