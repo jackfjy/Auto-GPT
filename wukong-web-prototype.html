@@ -353,10 +353,10 @@
   .claim:disabled { opacity: 0.55; cursor: default; }
   .home-scroll { flex: 1; min-height: 0; overflow: auto; }
   .home-stage {
-    min-height: calc(100vh - 52px);
-    min-height: calc(100dvh - 52px);
+    min-height: calc(100vh - 52px - 148px);
+    min-height: calc(100dvh - 52px - 148px);
     display: flex; flex-direction: column;
-    box-sizing: border-box; padding: 36px 28px 18px;
+    box-sizing: border-box; padding: 36px 28px 8px;
   }
   .home-hero {
     width: min(780px, 100%); margin: 0 auto; flex: 1;
@@ -366,7 +366,38 @@
   .home-hero .greet { color: var(--muted); margin: 0 0 28px; }
   .home-hero .suggests { gap: 12px; }
   .home-composer { width: min(780px, 100%); margin: 28px auto 0; flex: none; }
-  .home-more { margin: 12px 0 0; text-align: center; color: var(--faint); font-size: 12px; }
+  .yt-bar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; gap: 8px;
+    min-height: 56px; padding: 10px 16px 10px 20px;
+    background: var(--bg); border-top: 1px solid var(--line);
+    box-shadow: 0 10px 18px rgba(40, 32, 22, 0.05);
+  }
+  .yt-bar-scroll {
+    display: flex; gap: 12px; overflow-x: auto; flex: 1; min-width: 0;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  }
+  .yt-bar-scroll::-webkit-scrollbar { display: none; }
+  .yt-chip {
+    flex: none; height: 32px; padding: 0 12px; border: 0; border-radius: 8px;
+    background: rgba(30, 27, 23, 0.06); color: var(--ink);
+    font-size: 14px; font-weight: 550; line-height: 32px; white-space: nowrap;
+  }
+  .yt-chip.on { background: var(--ink); color: var(--paper); }
+  .yt-chip:hover { background: rgba(30, 27, 23, 0.12); }
+  .yt-chip.on:hover { background: var(--ink); }
+  html[data-theme="ink"] .yt-chip { background: rgba(255,255,255,.1); }
+  html[data-theme="ink"] .yt-chip:hover { background: rgba(255,255,255,.16); }
+  html[data-theme="ink"] .yt-chip.on, html[data-theme="ink"] .yt-chip.on:hover { background: var(--ink); color: #141311; }
+  .yt-bar-next, .yt-bar-down {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0;
+    display: grid; place-items: center;
+  }
+  .yt-bar-next { background: var(--paper); color: var(--ink); box-shadow: 0 1px 6px rgba(0,0,0,.18); }
+  .yt-bar-down { background: var(--ink); color: var(--paper); }
+  html[data-theme="ink"] .yt-bar-down { color: #141311; }
   .plaza-wrap { width: 100%; margin: 0; padding: 8px 28px 48px; box-sizing: border-box; }
   .plaza-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 8px 0 14px; }
   .plaza-head h2 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
@@ -544,7 +575,7 @@
     @media (max-width: 380px) { .pm-foot { flex-direction: column; } }
     .side-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
     .composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
-    .home-more { margin-bottom: env(safe-area-inset-bottom); }
+    .yt-bar { padding-left: 12px; padding-right: 10px; }
     input, textarea, select { font-size: 16px; }
     table { display: block; overflow-x: auto; }
   }
@@ -661,16 +692,16 @@ const state = {
     { id:"task-6", title:"城墙灯会主视觉", kind:"图片创作", status:"已完成", progress:100, time:"周二", tone:"#7a3b3b", media:"图片" }
   ],
   works: [
-    { id:"w1", title:"秦淮夜游：把灯影收成一条片", kind:"视频", author:"宏志", likes:128, mine:false, vis:"公开", tone:"#1d4e63", h:228, dur:"03:18" },
-    { id:"w2", title:"新品礼遇季", kind:"图片", author:"林夏", likes:46, mine:true, vis:"公开", tone:"#6d4c41", h:168 },
-    { id:"w3", title:"明朝服饰 · 婚服改稿", kind:"图片", author:"梦云端", likes:203, mine:false, vis:"公开", tone:"#5c3a4a", h:248 },
-    { id:"w4", title:"英式司康，热气还在", kind:"图片", author:"李瑞", likes:87, mine:false, vis:"公开", tone:"#8a5a32", h:186 },
-    { id:"w5", title:"城市夜景", kind:"视频", author:"林夏", likes:64, mine:true, vis:"私密", tone:"#243044", h:210, dur:"00:48" },
-    { id:"w6", title:"夜宵摊烟火", kind:"视频", author:"阿城", likes:151, mine:false, vis:"公开", tone:"#6a3a22", h:196, dur:"01:06" },
-    { id:"w7", title:"梧桐影里的晚饭", kind:"视频", author:"阿城", likes:96, mine:false, vis:"公开", tone:"#3d4a32", h:236, dur:"01:24" },
-    { id:"w8", title:"城墙灯会主视觉", kind:"图片", author:"梦云端", likes:312, mine:false, vis:"公开", tone:"#7a3b3b", h:160 },
-    { id:"w9", title:"老门东粉丝汤", kind:"图片", author:"李瑞", likes:74, mine:false, vis:"公开", tone:"#a15a32", h:214 },
-    { id:"w10", title:"中山陵台阶上的风", kind:"视频", author:"宏志", likes:189, mine:false, vis:"公开", tone:"#2f4a44", h:188, dur:"02:11" }
+    { id:"w1", title:"秦淮夜游：把灯影收成一条片", kind:"视频", topics:["城市","夜景","旅行"], author:"宏志", likes:128, mine:false, vis:"公开", tone:"#1d4e63", h:228, dur:"03:18" },
+    { id:"w2", title:"新品礼遇季", kind:"图片", topics:["商业"], author:"林夏", likes:46, mine:true, vis:"公开", tone:"#6d4c41", h:168 },
+    { id:"w3", title:"明朝服饰 · 婚服改稿", kind:"图片", topics:["服饰"], author:"梦云端", likes:203, mine:false, vis:"公开", tone:"#5c3a4a", h:248 },
+    { id:"w4", title:"英式司康，热气还在", kind:"图片", topics:["美食"], author:"李瑞", likes:87, mine:false, vis:"公开", tone:"#8a5a32", h:186 },
+    { id:"w5", title:"城市夜景", kind:"视频", topics:["城市","夜景"], author:"林夏", likes:64, mine:true, vis:"私密", tone:"#243044", h:210, dur:"00:48" },
+    { id:"w6", title:"夜宵摊烟火", kind:"视频", topics:["美食","夜景"], author:"阿城", likes:151, mine:false, vis:"公开", tone:"#6a3a22", h:196, dur:"01:06" },
+    { id:"w7", title:"梧桐影里的晚饭", kind:"视频", topics:["美食"], author:"阿城", likes:96, mine:false, vis:"公开", tone:"#3d4a32", h:236, dur:"01:24" },
+    { id:"w8", title:"城墙灯会主视觉", kind:"图片", topics:["城市","夜景"], author:"梦云端", likes:312, mine:false, vis:"公开", tone:"#7a3b3b", h:160 },
+    { id:"w9", title:"老门东粉丝汤", kind:"图片", topics:["美食"], author:"李瑞", likes:74, mine:false, vis:"公开", tone:"#a15a32", h:214 },
+    { id:"w10", title:"中山陵台阶上的风", kind:"视频", topics:["城市","旅行"], author:"宏志", likes:189, mine:false, vis:"公开", tone:"#2f4a44", h:188, dur:"02:11" }
   ],
   notices: [
     { title:"活动通知", time:"12 分钟前", text:"悟空送宝，20000 龙豆已充入你的钱袋。", unread:true },
@@ -1033,7 +1064,9 @@ function icon(name) {
     side: '<path d="M4 5h16v14H4z"/><path d="M9 5v14"/>',
     attach: '<path d="M8 12.5l6.5-6.5a3 3 0 0 1 4.2 4.2l-7.8 7.8a4.5 4.5 0 0 1-6.4-6.4l7.2-7.1"/>',
     mic: '<rect x="9" y="3" width="6" height="10" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/>',
-    close: '<path d="M6 6l12 12M18 6L6 18"/>'
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+    chevron: '<path d="M9 6l6 6-6 6"/>',
+    down: '<path d="M6 9l6 6 6-6"/>'
   };
   return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`;
 }
@@ -1149,8 +1182,8 @@ function chatView() {
             <div class="suggests">${suggests}</div>
           </div>
           <div class="home-composer composer-inner">${composerBlock([], enterprise)}</div>
-          <p class="home-more">向下滚动，查看广场</p>
         </div>
+        ${ytBar()}
         <div class="plaza-wrap">${plazaFeed()}</div>
       </div>
       ${state.noticeOpen ? notices() : ""}
@@ -1223,13 +1256,28 @@ function partnerView() {
   const action = a.retired ? `<button class="ghost" disabled>已下架</button>` : a.owned ? `<button class="primary" style="width:auto" data-act="use" data-id="${a.id}">开始对话</button>` : `<button class="primary" style="width:auto" data-act="sub" data-id="${a.id}">${a.cost ? "订阅 · " + a.price : "添加"}</button>`;
   return pageShell(a.name, a.role, `<div class="detail"><div class="card" style="cursor:default"><span class="tag">${esc(a.source)}</span><p style="margin-top:10px">${esc(a.about)}</p><p class="meta">${esc(a.uses)} 次使用</p><div class="row" style="margin-top:12px">${action}<button class="ghost" data-go="#/partners">返回</button></div></div><div><div class="label">能做的事</div><div class="chips">${(a.domains||[]).map(d => `<button data-act="use" data-id="${a.id}">${esc(d)}</button>`).join("")}</div><p class="meta">召唤之后，它会成为左侧的一条对话，而不是另一个应用。</p></div></div>`);
 }
+const PLAZA_CHIPS = ["全部","视频","图片","美食","城市","夜景","服饰","旅行"];
+function matchesPlaza(w) {
+  if (w.vis !== "公开") return false;
+  const f = state.plazaFilter || "全部";
+  if (f === "全部") return true;
+  if (f === "视频" || f === "图片") return w.kind === f;
+  return (w.topics || []).includes(f);
+}
+function ytBar() {
+  const chips = PLAZA_CHIPS.map(n => `<button type="button" class="yt-chip${state.plazaFilter===n?" on":""}" data-act="plaza" data-id="${n}">${n}</button>`).join("");
+  return `<div class="yt-bar"><div class="yt-bar-scroll">${chips}</div><button type="button" class="yt-bar-next" data-act="chips-next" aria-label="更多分类">${icon("chevron")}</button><button type="button" class="yt-bar-down" data-act="plaza-down" aria-label="向下滚动，查看广场">${icon("down")}</button></div>`;
+}
+function revealPlaza() {
+  const sc = document.getElementById("home-scroll");
+  const plaza = document.querySelector(".plaza-wrap");
+  if (sc && plaza) sc.scrollTo({ top: Math.max(0, plaza.offsetTop - 56), behavior: "smooth" });
+}
 function plazaFeed() {
-  const items = state.works.filter(w => w.vis === "公开" && (state.plazaFilter === "全部" || w.kind === state.plazaFilter));
-  return `<div class="plaza-head"><div><h2>广场</h2><p>公开作品。有封面、有标题，点开可以看、收藏和评论。</p></div></div>${filters(["全部","图片","视频"], state.plazaFilter, "plaza")}${mediaCards(items)}`;
+  return mediaCards(state.works.filter(matchesPlaza));
 }
 function plazaView() {
-  const items = state.works.filter(w => w.vis === "公开" && (state.plazaFilter === "全部" || w.kind === state.plazaFilter));
-  return pageShell("广场", "公开作品。自己的可以继续修图或混剪，别人的可以看、收藏和评论。", filters(["全部","图片","视频"], state.plazaFilter, "plaza") + mediaCards(items));
+  return pageShell("广场", "公开作品。自己的可以继续修图或混剪，别人的可以看、收藏和评论。", ytBar() + mediaCards(state.works.filter(matchesPlaza)));
 }
 function worksView() {
   const items = state.works.filter(w => state.workTab === "公开" ? w.mine && w.vis === "公开" : state.workTab === "私密" ? w.mine && w.vis === "私密" : w.mine);
@@ -1404,7 +1452,9 @@ function onAct(act, el) {
   if (act === "cat") { state.cat = id; return render(); }
   if (act === "sub") return subscribe(id);
   if (act === "use") return openAgent(id);
-  if (act === "plaza") { state.plazaFilter = id; return render(); }
+  if (act === "plaza") { state.plazaFilter = id || "全部"; render(); revealPlaza(); return; }
+  if (act === "plaza-down") { revealPlaza(); return; }
+  if (act === "chips-next") { const row = document.querySelector(".yt-bar-scroll"); if (row) row.scrollBy({ left: 220, behavior: "smooth" }); return; }
   if (act === "worktab") { state.workTab = id; return render(); }
   if (act === "open-work") { state.workId = id; state.modal = "work"; return render(); }
   if (act === "edit-work") { state.modal = null; state.studioTab = "retouch"; go("#/chat/t-creator?panel=studio&tab=retouch"); return; }
