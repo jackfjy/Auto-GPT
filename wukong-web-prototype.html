@@ -1454,7 +1454,19 @@ function onAct(act, el) {
   if (act === "cat") { state.cat = id; return render(); }
   if (act === "sub") return subscribe(id);
   if (act === "use") return openAgent(id);
-  if (act === "plaza") { state.plazaFilter = id || "全部"; render(); revealPlaza(); return; }
+  if (act === "plaza") {
+    const sc = document.getElementById("home-scroll") || document.querySelector(".page");
+    const row = document.querySelector(".yt-bar-scroll");
+    const keep = sc ? sc.scrollTop : 0;
+    const chipLeft = row ? row.scrollLeft : 0;
+    state.plazaFilter = id || "全部";
+    render();
+    const next = document.getElementById("home-scroll") || document.querySelector(".page");
+    if (next) next.scrollTop = keep;
+    const nextRow = document.querySelector(".yt-bar-scroll");
+    if (nextRow) nextRow.scrollLeft = chipLeft;
+    return;
+  }
   if (act === "plaza-down") { revealPlaza(); return; }
   if (act === "chips-next") { const row = document.querySelector(".yt-bar-scroll"); if (row) row.scrollBy({ left: 220, behavior: "smooth" }); return; }
   if (act === "worktab") { state.workTab = id; return render(); }
